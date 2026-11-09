@@ -50,7 +50,8 @@ export async function updateShopSettingsAction(formData: FormData) {
   }
 
   if (logoFile) {
-    const saved = await saveUploadedImage(logoFile, "branding", "logo");
+    const logoBasename = `logo-${crypto.randomUUID().replaceAll("-", "").slice(0, 12)}`;
+    const saved = await saveUploadedImage(logoFile, "branding", logoBasename);
     if ("error" in saved) {
       return { error: saved.error };
     }
