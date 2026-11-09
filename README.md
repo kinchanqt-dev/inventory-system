@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Inventory POS
 
-## Getting Started
+Local full-stack inventory + POS for a small food business.
 
-First, run the development server:
+## Stack
+
+- Next.js (App Router)
+- shadcn/ui
+- Prisma 7 + MySQL
+- Auth.js (credentials)
+
+## Quick start
 
 ```bash
+# 1. Start MySQL
+docker compose up -d
+
+# 2. Install deps
+npm install
+
+# 3. Copy env (already present as .env for local)
+cp .env.example .env
+
+# 4. Migrate + seed
+npx prisma migrate dev
+npx prisma db seed
+
+# 5. Run app
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Seeded logins
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Email | Password | Role |
+| --- | --- | --- |
+| owner@local.dev | password123 | OWNER |
+| cashier@local.dev | password123 | CASHIER |
 
-## Learn More
+## Features in this MVP
 
-To learn more about Next.js, take a look at the following resources:
+- Product catalog (SKU-only, optional product images)
+- Shop branding (title, logo, colors) via Owner Settings
+- Inventory adjustments with reasons
+- Tablet-friendly POS checkout with manual payment methods: Cash, QRPh, GCash, Maya, Card, Other
+- Sales history + dashboard snapshot
+- Role-aware navigation (cashier focuses on POS/sales)
+- Optional HTTP Basic Auth gate for protecting a LAN/server install
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## HTTP Basic Auth (shop server)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Set both variables in `.env` on the machine that hosts the app:
 
-## Deploy on Vercel
+```bash
+BASIC_AUTH_USER="shop"
+BASIC_AUTH_PASSWORD="choose-a-strong-password"
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Browsers will prompt once, then staff still sign in with Owner/Cashier accounts. Leave both empty for local development without the prompt. Prefer Tailscale/VPN or TLS termination (nginx/Caddy) for anything beyond a trusted LAN.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notes
+
+- Money is stored as integer centavos
+- Stock changes happen inside Prisma transactions with sales
+- Uploaded logos/images live under `public/uploads/` (gitignored)
+- Online payment gateways are intentionally out of scope for now

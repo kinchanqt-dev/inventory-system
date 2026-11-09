@@ -9,33 +9,68 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+.pnpm-store
+
+# npm lockfile (this project uses pnpm)
+package-lock.json
 
 # testing
 /coverage
+/playwright-report
+/test-results
+/blob-report
 
 # next.js
 /.next/
 /out/
 
-# production
+# production / build
 /build
+/dist
 
 # misc
 .DS_Store
+Thumbs.db
 *.pem
+*.key
 
-# debug
+# debug / logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+*.log
 
-# env files (can opt-in for committing if needed)
-.env*
+# caches
+.eslintcache
+.turbo
+*.tsbuildinfo
+
+# env files (keep example committed)
+.env
+.env.*
+!.env.example
+
+# generated prisma client
+/src/generated
+
+# fallow
+.fallow
+fallow-audit.json
+fallow-lock.json
+fallow-lock.yaml
 
 # vercel
 .vercel
 
 # typescript
-*.tsbuildinfo
 next-env.d.ts
+
+# local IDE / editor
+.idea
+
+# user-uploaded branding / product images
+/public/uploads/branding/*
+/public/uploads/products/*
+!/public/uploads/branding/.gitkeep
+!/public/uploads/products/.gitkeep

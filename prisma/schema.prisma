@@ -1,0 +1,158 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum Role {
+  OWNER
+  CASHIER
+}
+
+enum StockMovementType {
+  IN
+  OUT
+  ADJUST
+  SALE
+  REFUND
+}
+
+enum PaymentMethod {
+  CASH
+  QRPH
+  GCASH
+  MAYA
+  CARD
+  OTHER
+}
+
+enum SaleStatus {
+  COMPLETED
+  VOIDED
+  REFUNDED
+}
+
+model User {
+  id           String          @id @default(cuid())
+  name         String
+  email        String          @unique
+  passwordHash String
+  role         Role            @default(CASHIER)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  sales        Sale[]
+  movements    StockMovement[]
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  products  Product[]
+}
+
+model Product {
+  id          String          @id @default(cuid())
+  sku         String          @unique
+  barcode     String?         @unique
+  name        String
+  description String?         @db.Text
+  imagePath   String?
+  categoryId  String?
+  priceCents  Int
+  costCents   Int             @default(0)
+  unit        String          @default("pc")
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  category    Category?       @relation(fields: [categoryId], references: [id])
+  stock       StockItem?
+  movements   StockMovement[]
+  saleItems   SaleItem[]
+
+  @@index([name])
+  @@index([isActive])
+}
+
+model ShopSettings {
+  id            String   @id @default("default")
+  shopTitle     String   @default("Inventory POS")
+  tagline       String?  @default("Local Food")
+  logoPath      String?
+  primaryColor    String   @default("#1a1a1a")
+  accentColor     String   @default("#2f5d50")
+  backgroundColor String   @default("#f7f4ef")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model StockItem {
+  id           String   @id @default(cuid())
+  productId    String   @unique
+  quantity     Int      @default(0)
+  reorderLevel Int      @default(5)
+  updatedAt    DateTime @updatedAt
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model StockMovement {
+  id        String            @id @default(cuid())
+  productId String
+  type      StockMovementType
+  quantity  Int
+  reason    String?
+  userId    String?
+  saleId    String?
+  createdAt DateTime          @default(now())
+  product   Product           @relation(fields: [productId], references: [id])
+  user      User?             @relation(fields: [userId], references: [id])
+  sale      Sale?             @relation(fields: [saleId], references: [id])
+
+  @@index([productId, createdAt])
+  @@index([saleId])
+}
+
+model Sale {
+  id              String           @id @default(cuid())
+  saleNumber      String           @unique
+  status          SaleStatus       @default(COMPLETED)
+  subtotalCents   Int
+  discountCents   Int              @default(0)
+  totalCents      Int
+  paymentMethod   PaymentMethod
+  paymentNote     String?
+  amountTenderedCents Int?
+  changeCents     Int?
+  cashierId       String
+  voidReason      String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  cashier         User             @relation(fields: [cashierId], references: [id])
+  items           SaleItem[]
+  movements       StockMovement[]
+
+  @@index([createdAt])
+  @@index([status])
+  @@index([paymentMethod])
+}
+
+model SaleItem {
+  id          String  @id @default(cuid())
+  saleId      String
+  productId   String
+  productName String
+  productSku  String
+  quantity    Int
+  unitPriceCents Int
+  lineTotalCents Int
+  sale        Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  product     Product @relation(fields: [productId], references: [id])
+
+  @@index([saleId])
+  @@index([productId])
+}
