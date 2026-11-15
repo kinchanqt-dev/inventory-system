@@ -1,5 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 
+import { parseBasicAuthHeader } from "@/lib/basic-auth-parse";
+
 function safeEqual(left: string, right: string): boolean {
   const leftBuffer = Buffer.from(left);
   const rightBuffer = Buffer.from(right);
@@ -22,39 +24,30 @@ export function getBasicAuthCredentials() {
   return { user, password };
 }
 
+function credentialsMatch(
+  parsed: { user: string; password: string },
+  expected: { user: string; password: string },
+) {
+  return (
+    safeEqual(parsed.user, expected.user) &&
+    safeEqual(parsed.password, expected.password)
+  );
+}
+
 export function isAuthorizedBasicAuth(header: string | null): boolean {
   const credentials = getBasicAuthCredentials();
   if (!credentials) {
     return true;
   }
 
-  if (!header?.startsWith("Basic ")) {
+  if (!header) {
     return false;
   }
 
-  try {
-    const decoded = Buffer.from(header.slice(6), "base64").toString("utf8");
-    const separator = decoded.indexOf(":");
-    if (separator <= 0) {
-      return false;
-    }
-
-    const user = decoded.slice(0, separator);
-    const password = decoded.slice(separator + 1);
-    return (
-      safeEqual(user, credentials.user) &&
-      safeEqual(password, credentials.password)
-    );
-  } catch {
+  const parsed = parseBasicAuthHeader(header);
+  if (!parsed) {
     return false;
   }
-}
 
-export function unauthorizedBasicResponse() {
-  return new Response("Authentication required", {
-    status: 401,
-    headers: {
-      "WWW-Authenticate": 'Basic realm="Inventory POS", charset="UTF-8"',
-    },
-  });
+  return credentialsMatch(parsed, credentials);
 }

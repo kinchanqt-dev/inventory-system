@@ -6,7 +6,13 @@ const ACCEPTED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_BYTES = 2 * 1024 * 1024;
 
 function isAcceptedFile(file: File) {
-  return ACCEPTED_TYPES.has(file.type) && file.size > 0 && file.size <= MAX_BYTES;
+  if (!ACCEPTED_TYPES.has(file.type)) {
+    return false;
+  }
+  if (file.size <= 0) {
+    return false;
+  }
+  return file.size <= MAX_BYTES;
 }
 
 function assignFileToInput(input: HTMLInputElement, file: File | null) {
@@ -15,6 +21,13 @@ function assignFileToInput(input: HTMLInputElement, file: File | null) {
     transfer.items.add(file);
   }
   input.files = transfer.files;
+}
+
+function revokePreviewUrl(preview: string | null) {
+  if (!preview) {
+    return;
+  }
+  URL.revokeObjectURL(preview);
 }
 
 interface UseImageDropzoneStateOptions {
@@ -31,13 +44,21 @@ export function useImageDropzoneState({
   const [localError, setLocalError] = useState<string | null>(null);
 
   function clearSelection() {
-    if (selectedPreview) {
-      URL.revokeObjectURL(selectedPreview);
-    }
+    revokePreviewUrl(selectedPreview);
     setSelectedPreview(null);
     setSelectedName(null);
     if (inputRef.current) {
       assignFileToInput(inputRef.current, null);
+    }
+  }
+
+  function commitSelectedFile(file: File) {
+    revokePreviewUrl(selectedPreview);
+    setSelectedPreview(URL.createObjectURL(file));
+    setSelectedName(file.name);
+    onRemoveChange?.(false);
+    if (inputRef.current) {
+      assignFileToInput(inputRef.current, file);
     }
   }
 
@@ -55,17 +76,7 @@ export function useImageDropzoneState({
       return;
     }
 
-    if (selectedPreview) {
-      URL.revokeObjectURL(selectedPreview);
-    }
-
-    setSelectedPreview(URL.createObjectURL(file));
-    setSelectedName(file.name);
-    onRemoveChange?.(false);
-
-    if (inputRef.current) {
-      assignFileToInput(inputRef.current, file);
-    }
+    commitSelectedFile(file);
   }
 
   return {

@@ -2,11 +2,15 @@
 
 import { useState, useTransition } from "react";
 
+import { useFormDirtyGuard } from "@/hooks";
+
 import { ImageDropzone } from "@/components/shared/image-dropzone";
 import { Button, Input, Label } from "@/components/ui";
 
-import { updateShopSettingsAction } from "@/features/settings/api/settings.actions";
 import { SettingsColorFields } from "@/features/settings/components/settings-color-fields";
+import { SettingsCurrencyField } from "@/features/settings/components/settings-currency-field";
+import { SettingsFormFeedback } from "@/features/settings/components/settings-form-feedback";
+import { submitShopSettings } from "@/features/settings/lib/settings-form-submit";
 import { normalizeBranding } from "@/features/settings/lib/normalize-branding";
 
 import type { ShopBranding } from "@/features/settings/types/settings.types";
@@ -27,6 +31,7 @@ export function SettingsForm({ branding }: Readonly<SettingsFormProps>) {
   });
   const [removeLogo, setRemoveLogo] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const dirty = useFormDirtyGuard(isPending);
 
   function handleSubmit(formData: FormData) {
     setError(null);
@@ -37,18 +42,23 @@ export function SettingsForm({ branding }: Readonly<SettingsFormProps>) {
     formData.set("removeLogo", removeLogo ? "true" : "false");
 
     startTransition(async () => {
-      const result = await updateShopSettingsAction(formData);
-      if (result?.error) {
-        setError(result.error);
+      const result = await submitShopSettings(formData);
+      if ("error" in result) {
+        setError(result.error ?? "Could not save settings");
         return;
       }
       setRemoveLogo(false);
-      setMessage("Shop look saved");
+      dirty.markClean();
+      setMessage(result.message);
     });
   }
 
   return (
-    <form action={handleSubmit} className="mx-auto grid max-w-2xl gap-6">
+    <form
+      action={handleSubmit}
+      className="mx-auto grid max-w-2xl gap-6"
+      {...dirty.formDirtyProps}
+    >
       <section className="space-y-4 rounded-xl border border-border/80 p-4 sm:p-5">
         <div>
           <h2 className="text-base font-semibold tracking-tight">Shop name</h2>
@@ -84,7 +94,10 @@ export function SettingsForm({ branding }: Readonly<SettingsFormProps>) {
         colors={colors}
         showHex={showHex}
         onShowHexChange={setShowHex}
-        onColorsChange={setColors}
+        onColorsChange={(next) => {
+          dirty.markDirty();
+          setColors(next);
+        }}
       />
 
       <section className="space-y-4 rounded-xl border border-border/80 p-4 sm:p-5">
@@ -103,22 +116,96 @@ export function SettingsForm({ branding }: Readonly<SettingsFormProps>) {
           existingAlt={`${safeBranding.shopTitle} logo preview`}
           removeLabel="Remove current logo"
           removeChecked={removeLogo}
-          onRemoveChange={setRemoveLogo}
+          onRemoveChange={(checked) => {
+            dirty.markDirty();
+            setRemoveLogo(checked);
+          }}
           previewFit="contain"
         />
       </section>
 
-      {error ? <p className="text-sm text-destructive">{error}</p> : null}
-      {message ? (
-        <p className="text-sm text-emerald-700 dark:text-emerald-400">{message}</p>
-      ) : null}
+      <section className="space-y-4 rounded-xl border border-border/80 p-4 sm:p-5">
+        <div>
+          <h2 className="text-base font-semibold tracking-tight">
+            Food cost &amp; tax
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Used for recipe costing, suggested prices, and dashboard targets.
+            Most kitchens aim for about 28–35% food cost.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <SettingsCurrencyField defaultValue={safeBranding.currencySymbol} />
+          <div className="space-y-2">
+            <Label htmlFor="salesTaxPercent">Sales tax %</Label>
+            <Input
+              id="salesTaxPercent"
+              name="salesTaxPercent"
+              type="number"
+              step="0.1"
+              min="0"
+              max="100"
+              defaultValue={safeBranding.salesTaxPercent}
+              className="min-h-11"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="targetFoodCostPercent">Target food cost %</Label>
+            <Input
+              id="targetFoodCostPercent"
+              name="targetFoodCostPercent"
+              type="number"
+              step="0.1"
+              min="1"
+              max="100"
+              defaultValue={safeBranding.targetFoodCostPercent}
+              className="min-h-11"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="dashboardYear">Dashboard year</Label>
+            <Input
+              id="dashboardYear"
+              name="dashboardYear"
+              type="number"
+              min="2020"
+              max="2100"
+              defaultValue={safeBranding.dashboardYear}
+              className="min-h-11"
+            />
+          </div>
+          <div className="flex items-start gap-3 text-sm sm:col-span-2">
+            <input
+              id="pricesIncludeTax"
+              type="checkbox"
+              name="pricesIncludeTax"
+              value="true"
+              defaultChecked={safeBranding.pricesIncludeTax}
+              aria-describedby="pricesIncludeTax-hint"
+              className="mt-1 size-4 rounded border-border"
+            />
+            <div>
+              <Label htmlFor="pricesIncludeTax">Menu prices include tax</Label>
+              <p
+                id="pricesIncludeTax-hint"
+                className="mt-0.5 text-xs text-muted-foreground"
+              >
+                When checked, food cost % is measured against the price after
+                removing tax.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <SettingsFormFeedback error={error} message={message} />
 
       <Button
         type="submit"
         disabled={isPending}
         className="min-h-11 w-full sm:w-auto"
       >
-        {isPending ? "Saving..." : "Save shop look"}
+        {isPending ? "Saving..." : "Save settings"}
       </Button>
     </form>
   );

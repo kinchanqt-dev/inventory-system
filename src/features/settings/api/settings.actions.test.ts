@@ -1,16 +1,24 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/session", () => ({
-  requireRole: vi.fn(async () => ({ user: { id: "u1", role: "OWNER" } })),
+  requireRole: vi.fn(async () => ({
+    user: { id: "u1", role: "OWNER" },
+    organization: {
+      id: "org-1",
+      logo_path: null,
+      shop_title: "Shop",
+    },
+  })),
 }));
 
-vi.mock("@/lib/prisma", () => ({
-  prisma: {
-    shopSettings: {
-      findUnique: vi.fn(async () => null),
-      upsert: vi.fn(async () => ({ id: "default" })),
-    },
-  },
+vi.mock("@/lib/supabase/server", () => ({
+  createClient: vi.fn(async () => ({
+    from: () => ({
+      update: () => ({
+        eq: vi.fn(async () => ({ error: null })),
+      }),
+    }),
+  })),
 }));
 
 vi.mock("@/lib/uploads", () => ({

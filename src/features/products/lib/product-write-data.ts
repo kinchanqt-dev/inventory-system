@@ -1,4 +1,9 @@
 import { pesosToCents } from "@/lib/money";
+import {
+  formDataBoolean,
+  formDataNumberField,
+  formDataString,
+} from "@/lib/form-data-helpers";
 
 interface ProductWriteInput {
   sku: string;
@@ -10,19 +15,25 @@ interface ProductWriteInput {
   cost: number;
   unit: string;
   isActive: boolean;
+  sendsToKitchen?: boolean;
+}
+
+function nullableString(value: string | undefined) {
+  return value || null;
 }
 
 export function toProductWriteData(data: ProductWriteInput) {
   return {
     sku: data.sku.toUpperCase(),
-    barcode: data.barcode || null,
+    barcode: nullableString(data.barcode),
     name: data.name,
-    description: data.description || null,
-    categoryId: data.categoryId || null,
-    priceCents: pesosToCents(data.price),
-    costCents: pesosToCents(data.cost),
+    description: nullableString(data.description),
+    category_id: nullableString(data.categoryId),
+    price_cents: pesosToCents(data.price),
+    cost_cents: pesosToCents(data.cost),
     unit: data.unit,
-    isActive: data.isActive,
+    is_active: data.isActive,
+    sends_to_kitchen: data.sendsToKitchen ?? true,
   };
 }
 
@@ -33,6 +44,16 @@ export function emptyToUndefined(value: FormDataEntryValue | null) {
 
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : undefined;
+}
+
+function readProductQuantity(
+  formData: FormData,
+  includeQuantity: boolean | undefined,
+) {
+  if (!includeQuantity) {
+    return undefined;
+  }
+  return formDataNumberField(formData, "quantity", 0);
 }
 
 export function readProductFormData(
@@ -46,10 +67,11 @@ export function readProductFormData(
     description: emptyToUndefined(formData.get("description")),
     categoryId: emptyToUndefined(formData.get("categoryId")),
     price: formData.get("price"),
-    cost: formData.get("cost") || 0,
-    unit: formData.get("unit") || "pc",
-    quantity: options?.includeQuantity ? formData.get("quantity") || 0 : undefined,
-    reorderLevel: formData.get("reorderLevel") || 5,
-    isActive: formData.get("isActive") !== "false",
+    cost: formDataNumberField(formData, "cost", 0),
+    unit: formDataString(formData, "unit", "pc"),
+    quantity: readProductQuantity(formData, options?.includeQuantity),
+    reorderLevel: formDataNumberField(formData, "reorderLevel", 5),
+    isActive: formDataBoolean(formData, "isActive", true, false),
+    sendsToKitchen: formDataBoolean(formData, "sendsToKitchen"),
   };
 }

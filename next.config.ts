@@ -4,6 +4,15 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   cacheComponents: true,
   partialPrefetching: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "ywcxjeyeiepiksywcdmm.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+    ],
+  },
   rewrites() {
     return [{ source: "/favicon.ico", destination: "/icon" }];
   },

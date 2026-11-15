@@ -1,62 +1,81 @@
 import { startOfDay } from "date-fns";
 
-import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
+import { createClient } from "@/lib/supabase/server";
+
+import { assertNoQueryErrors } from "@/features/sales/lib/assert-query-results";
+import { aggregateDashboardStats } from "@/features/sales/lib/dashboard-stats";
+import { fetchRecentSalesFallback } from "@/features/sales/lib/fetch-recent-sales-fallback";
+import {
+  mapSaleRowsPrimary,
+  queryRecentSalesWithCashier,
+} from "@/features/sales/lib/list-recent-sales-query";
+
+import type { Sale } from "@/types/database.types";
+
+type SaleRow = Sale & {
+  profiles: { id: string; name: string } | null;
+  sale_items: Array<{
+    id: string;
+    product_name: string;
+    product_sku: string;
+    quantity: number;
+    unit_price_cents: number;
+    line_total_cents: number;
+  }>;
+};
 
 export async function listRecentSales(limit = 50) {
-  return await prisma.sale.findMany({
-    include: {
-      cashier: {
-        select: { name: true },
-      },
-      items: true,
-    },
-    orderBy: { createdAt: "desc" },
-    take: limit,
-  });
+  const session = await requireSession();
+  const supabase = await createClient();
+  const orgId = session.organization.id;
+
+  const { data, error } = await queryRecentSalesWithCashier(
+    supabase,
+    orgId,
+    limit,
+  );
+
+  if (error) {
+    return fetchRecentSalesFallback(supabase, orgId, limit);
+  }
+
+  return mapSaleRowsPrimary((data ?? []) as SaleRow[]);
 }
 
-/** Sales history for the Sales page — capped for client filter + pagination. */
 export async function listSalesHistory(limit = 250) {
   return await listRecentSales(limit);
 }
 
 export async function getDashboardStats() {
-  const today = startOfDay(new Date());
+  const session = await requireSession();
+  const supabase = await createClient();
+  const today = startOfDay(new Date()).toISOString();
+  const orgId = session.organization.id;
 
-  const [todaySales, stockItems, productCount] = await Promise.all([
-    prisma.sale.findMany({
-      where: {
-        createdAt: { gte: today },
-        status: "COMPLETED",
-      },
-      select: {
-        totalCents: true,
-        paymentMethod: true,
-      },
-    }),
-    prisma.stockItem.findMany({
-      select: {
-        quantity: true,
-        reorderLevel: true,
-      },
-    }),
-    prisma.product.count({ where: { isActive: true } }),
+  const [salesResult, stockResult, productResult] = await Promise.all([
+    supabase
+      .from("sales")
+      .select("total_cents, payment_method")
+      .eq("organization_id", orgId)
+      .eq("status", "COMPLETED")
+      .gte("created_at", today),
+    supabase
+      .from("stock_items")
+      .select("quantity, reorder_level")
+      .eq("organization_id", orgId),
+    supabase
+      .from("products")
+      .select("id", { count: "exact", head: true })
+      .eq("organization_id", orgId)
+      .eq("is_active", true),
   ]);
 
-  const revenueCents = todaySales.reduce((sum, sale) => sum + sale.totalCents, 0);
-  const byMethod = todaySales.reduce<Record<string, number>>((acc, sale) => {
-    acc[sale.paymentMethod] = (acc[sale.paymentMethod] ?? 0) + sale.totalCents;
-    return acc;
-  }, {});
-  const lowStockCount = stockItems.filter(
-    (item) => item.quantity <= item.reorderLevel,
-  ).length;
+  assertNoQueryErrors(salesResult, stockResult);
 
-  return {
-    revenueCents,
-    completedToday: todaySales.length,
-    lowStockCount,
-    productCount,
-    byMethod,
-  };
+  return aggregateDashboardStats(
+    salesResult.data ?? [],
+    stockResult.data ?? [],
+    productResult.count ?? 0,
+  );
 }

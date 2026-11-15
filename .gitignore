@@ -74,3 +74,6 @@ next-env.d.ts
 /public/uploads/products/*
 !/public/uploads/branding/.gitkeep
 !/public/uploads/products/.gitkeep
+
+# Agents
+.agents/*

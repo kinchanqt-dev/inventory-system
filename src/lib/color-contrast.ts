@@ -48,21 +48,29 @@ export function contrastRatio(foregroundHex: string, backgroundHex: string): num
   return (lighter + 0.05) / (darker + 0.05);
 }
 
+function safeBackgroundHex(backgroundHex: string) {
+  if (isHexColor(backgroundHex)) {
+    return backgroundHex.trim();
+  }
+  return "#f7f4ef";
+}
+
+function pickReadableForeground(whiteContrast: number, blackContrast: number) {
+  if (whiteContrast >= 3) return "#ffffff";
+  if (blackContrast >= 3) return "#000000";
+  return whiteContrast >= blackContrast ? "#ffffff" : "#000000";
+}
+
 /**
  * Pick black or white text for a brand color.
  * Prefers white when it stays usable on buttons (≈3:1), so mid-tone brand
  * colors like caramel don’t get muddy black labels.
  */
 export function foregroundForBackground(backgroundHex: string): string {
-  const safeBackground = isHexColor(backgroundHex)
-    ? backgroundHex.trim()
-    : "#f7f4ef";
+  const safeBackground = safeBackgroundHex(backgroundHex);
   const whiteContrast = contrastRatio("#ffffff", safeBackground);
   const blackContrast = contrastRatio("#000000", safeBackground);
-
-  if (whiteContrast >= 3) return "#ffffff";
-  if (blackContrast >= 3) return "#000000";
-  return whiteContrast >= blackContrast ? "#ffffff" : "#000000";
+  return pickReadableForeground(whiteContrast, blackContrast);
 }
 
 export function meetsAaContrast(

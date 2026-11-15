@@ -17,6 +17,7 @@ export interface ProductFormValues {
   quantity?: number;
   reorderLevel?: number;
   isActive: boolean;
+  sendsToKitchen: boolean;
 }
 
 export interface ProductRowData {

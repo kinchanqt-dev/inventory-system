@@ -66,6 +66,9 @@ describe("product form components", () => {
 
     expect(screen.getByLabelText("Sold as")).toBeInTheDocument();
     expect(screen.getByLabelText("Price (₱)")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Add recipe ingredients above to calculate food cost/i),
+    ).toBeInTheDocument();
     expect(screen.getByPlaceholderText("RICE-MEAL-A")).toBeInTheDocument();
   });
 });

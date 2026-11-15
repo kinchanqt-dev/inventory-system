@@ -1,13 +1,14 @@
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/session", () => ({
-  requireRole: vi.fn(async () => ({ user: { id: "u1", role: "OWNER" } })),
+  requireRole: vi.fn(async () => ({
+    user: { id: "u1", role: "OWNER" },
+    organization: { id: "org-1" },
+  })),
 }));
 
-vi.mock("@/lib/prisma", () => ({
-  prisma: {
-    $transaction: vi.fn(),
-  },
+vi.mock("@/lib/supabase/server", () => ({
+  createClient: vi.fn(async () => ({ from: vi.fn() })),
 }));
 
 vi.mock("next/cache", () => ({

@@ -46,27 +46,4 @@ export function buildSaleLines(
   return { lineItems, subtotalCents };
 }
 
-export function resolveCashTotals(options: {
-  paymentMethod: string;
-  subtotalCents: number;
-  discountCents: number;
-  amountTenderedCents?: number;
-}) {
-  const totalCents = Math.max(options.subtotalCents - options.discountCents, 0);
-
-  if (
-    options.paymentMethod === "CASH" &&
-    typeof options.amountTenderedCents === "number" &&
-    options.amountTenderedCents < totalCents
-  ) {
-    throw new Error("Amount received is less than the total");
-  }
-
-  const changeCents =
-    options.paymentMethod === "CASH" &&
-    typeof options.amountTenderedCents === "number"
-      ? options.amountTenderedCents - totalCents
-      : null;
-
-  return { totalCents, changeCents };
-}
+export { resolveCashTotals } from "@/features/pos/lib/resolve-cash-totals";

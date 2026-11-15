@@ -1,45 +1,35 @@
+import Link from "next/link";
 import { Suspense } from "react";
 
-import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { PageViewTransition } from "@/components/shared/page-view-transition";
 
+import { AuthSurface } from "@/features/auth/components/auth-surface";
 import { LoginForm } from "@/features/auth";
-import { getShopBranding } from "@/features/settings";
+import { DEFAULT_BRANDING } from "@/features/settings/lib/normalize-branding";
 import { BrandMark } from "@/features/settings/components/brand-mark";
 
 export const instant = false;
 
-export default async function LoginPage() {
-  const branding = await getShopBranding();
-  const showSeedHint = process.env.NODE_ENV === "development";
-
+export default function LoginPage() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-login-surface">
-      <div
-        className="login-dot-pattern pointer-events-none absolute inset-0"
-        aria-hidden
-      />
-
-      <div className="absolute top-4 right-4 z-20 sm:top-6 sm:right-6">
-        <ThemeToggle />
-      </div>
-
-      <main className="relative z-10 mx-auto flex min-h-screen w-full max-w-lg flex-col justify-center px-4 py-16 sm:px-6">
+    <PageViewTransition>
+      <AuthSurface>
         <div className="animate-in fade-in slide-in-from-bottom-3 fill-mode-both duration-500">
           <BrandMark
-            branding={branding}
+            branding={DEFAULT_BRANDING}
             size="xl"
             className="flex-col items-start gap-4"
-            titleClassName="whitespace-normal"
+            titleClassName="font-heading whitespace-normal"
             taglineClassName="whitespace-normal"
           />
           <p className="mt-5 max-w-sm text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Sign in to manage stock and sales for {branding.shopTitle}.
+            Sign in to ring sales, track stock, and run your food shop.
           </p>
         </div>
 
         <section
           aria-label="Sign in"
-          className="mt-10 animate-in fade-in slide-in-from-bottom-4 fill-mode-both rounded-2xl border border-border/70 bg-card/90 p-5 shadow-sm backdrop-blur-sm duration-500 delay-150 sm:p-6"
+          className="mt-10 animate-in fade-in slide-in-from-bottom-4 fill-mode-both rounded-2xl border border-border/60 bg-card/85 p-5 shadow-[0_20px_50px_-28px_rgba(31,27,24,0.35)] backdrop-blur-md duration-500 delay-150 sm:p-6"
         >
           <Suspense
             fallback={
@@ -50,13 +40,17 @@ export default async function LoginPage() {
           >
             <LoginForm />
           </Suspense>
-          {showSeedHint ? (
-            <p className="mt-4 border-t border-border/60 pt-4 text-xs text-muted-foreground">
-              Dev only — owner@local.dev / cashier@local.dev · password123
-            </p>
-          ) : null}
+          <p className="mt-4 border-t border-border/60 pt-4 text-center text-sm text-muted-foreground">
+            New here?{" "}
+            <Link
+              href="/register"
+              className="font-medium text-foreground underline underline-offset-4"
+            >
+              Create an account
+            </Link>
+          </p>
         </section>
-      </main>
-    </div>
+      </AuthSurface>
+    </PageViewTransition>
   );
 }

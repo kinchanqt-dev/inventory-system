@@ -7,6 +7,14 @@ import { PosPaymentFields } from "@/features/pos/components/pos-payment-fields";
 import { PosProductGrid } from "@/features/pos/components/pos-product-grid";
 import { PosTerminal } from "@/features/pos/components/pos-terminal";
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    refresh: vi.fn(),
+    push: vi.fn(),
+    replace: vi.fn(),
+  }),
+}));
+
 vi.mock("@/features/pos/api/pos.actions", () => ({
   checkoutAction: vi.fn(),
 }));
@@ -31,9 +39,9 @@ const products = [
 
 describe("POS components", () => {
   it("renders PosTerminal", () => {
-    render(<PosTerminal products={products} />);
+    render(<PosTerminal products={products} shopName="Test Shop" />);
     expect(screen.getByText("Rice Meal A")).toBeInTheDocument();
-    expect(screen.getAllByText("Cart").length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/New sale|Cart/i).length).toBeGreaterThan(0);
   });
 
   it("renders product grid and cart pieces", () => {
@@ -83,7 +91,10 @@ describe("POS components", () => {
     );
 
     expect(screen.getAllByText("Rice Meal A").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Complete sale").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("New sale").length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByRole("button", { name: /Charge/i }).length,
+    ).toBeGreaterThan(0);
     expect(screen.getAllByRole("button", { name: "Cash" }).length).toBeGreaterThan(
       0,
     );

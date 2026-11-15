@@ -5,4 +5,9 @@ export interface ShopBranding {
   primaryColor: string;
   accentColor: string;
   backgroundColor: string;
+  currencySymbol: string;
+  salesTaxPercent: number;
+  pricesIncludeTax: boolean;
+  targetFoodCostPercent: number;
+  dashboardYear: number;
 }

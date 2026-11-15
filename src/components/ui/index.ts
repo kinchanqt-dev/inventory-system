@@ -1,3 +1,4 @@
+export * from "./alert-dialog";
 export * from "./badge";
 export * from "./button";
 export * from "./dialog";
@@ -7,6 +8,7 @@ export * from "./label";
 export * from "./select";
 export * from "./sheet";
 export * from "./sonner";
+export * from "./switch";
 export * from "./table";
 export * from "./textarea";
 export * from "./tooltip";

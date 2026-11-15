@@ -2,6 +2,8 @@ import { z } from "zod";
 
 import { isHexColor, isLightBackground } from "@/lib/color-contrast";
 
+import { DEFAULT_CURRENCY_SYMBOL } from "@/features/settings/lib/supported-currencies";
+
 const hexColor = (label: string) =>
   z
     .string()
@@ -18,4 +20,14 @@ export const settingsSchema = z.object({
     "Page background should stay light so text is easy to read",
   ),
   removeLogo: z.boolean().optional(),
+  currencySymbol: z.enum(["₱"]).default(DEFAULT_CURRENCY_SYMBOL),
+  salesTaxPercent: z.coerce.number().min(0).max(100).default(0),
+  pricesIncludeTax: z.coerce.boolean().default(true),
+  targetFoodCostPercent: z.coerce.number().min(1).max(100).default(33),
+  dashboardYear: z.coerce
+    .number()
+    .int()
+    .min(2020)
+    .max(2100)
+    .default(new Date().getFullYear()),
 });
