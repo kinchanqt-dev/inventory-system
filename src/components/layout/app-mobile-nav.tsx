@@ -1,64 +1,116 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
-import { cn } from "@/lib/utils";
-
+import { AppMobileMoreButton } from "@/components/layout/app-mobile-more-button";
+import { AppMobileMoreSheet } from "@/components/layout/app-mobile-more-sheet";
+import { AppMobileNavLink } from "@/components/layout/app-mobile-nav-link";
 import {
   isNavLinkActive,
-  NAV_LINKS,
+  navLinksBySection,
+  primaryMobileNavLinks,
+  secondaryMobileNavLinks,
 } from "@/components/layout/nav-links";
 
+import type { NavLink } from "@/components/layout/nav-links";
 import type { RoleValue } from "@/enums";
 
 interface AppMobileNavProps {
   role: RoleValue;
 }
 
-export function AppMobileNav({ role }: Readonly<AppMobileNavProps>) {
-  const pathname = usePathname();
-  const links = NAV_LINKS.filter((link) => link.roles.includes(role));
+function secondaryHrefSet(secondaryLinks: NavLink[]) {
+  return new Set(secondaryLinks.map((link) => link.href));
+}
+
+function moreNavGroups(role: RoleValue, secondaryLinks: NavLink[]) {
+  const secondaryHrefs = secondaryHrefSet(secondaryLinks);
+  return navLinksBySection(role)
+    .map((group) => ({
+      ...group,
+      links: group.links.filter((link) => secondaryHrefs.has(link.href)),
+    }))
+    .filter((group) => group.links.length > 0);
+}
+
+function isMoreActive(pathname: string, secondaryLinks: NavLink[]) {
+  return secondaryLinks.some((link) => isNavLinkActive(pathname, link.href));
+}
+
+function hasNoNavLinks(primaryLinks: NavLink[], secondaryLinks: NavLink[]) {
+  return primaryLinks.length === 0 && secondaryLinks.length === 0;
+}
+
+function MoreNavSlot({
+  secondaryLinks,
+  pathname,
+  moreOpen,
+  onOpen,
+}: Readonly<{
+  secondaryLinks: NavLink[];
+  pathname: string;
+  moreOpen: boolean;
+  onOpen: () => void;
+}>) {
+  if (secondaryLinks.length === 0) {
+    return null;
+  }
 
   return (
-    <nav
-      aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 pb-safe backdrop-blur md:hidden"
-    >
-      <ul className="grid auto-cols-fr grid-flow-col">
-        {links.map((link) => {
-          const Icon = link.icon;
-          const isActive = isNavLinkActive(pathname, link.href);
+    <li className="min-w-0">
+      <AppMobileMoreButton
+        isActive={isMoreActive(pathname, secondaryLinks)}
+        isOpen={moreOpen}
+        onOpen={onOpen}
+      />
+    </li>
+  );
+}
 
-          return (
+export function AppMobileNav({ role }: Readonly<AppMobileNavProps>) {
+  const pathname = usePathname();
+  const [moreOpen, setMoreOpen] = useState(false);
+  const primaryLinks = primaryMobileNavLinks(role);
+  const secondaryLinks = secondaryMobileNavLinks(role);
+
+  if (hasNoNavLinks(primaryLinks, secondaryLinks)) {
+    return null;
+  }
+
+  return (
+    <>
+      <nav
+        aria-label="Primary"
+        className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 pb-safe backdrop-blur md:hidden"
+      >
+        <ul className="grid auto-cols-fr grid-flow-col">
+          {primaryLinks.map((link) => (
             <li key={link.href} className="min-w-0">
-              <Link
+              <AppMobileNavLink
                 href={link.href}
-                aria-label={link.label}
-                aria-current={isActive ? "page" : undefined}
-                className={cn(
-                  "relative flex min-h-14 w-full flex-col items-center justify-center gap-0.5 px-0.5 py-2 text-nav-xs tracking-tight transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-                  isActive
-                    ? "font-medium text-primary"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {isActive ? (
-                  <span
-                    className="absolute inset-x-2 top-0 h-0.5 rounded-full bg-primary"
-                    aria-hidden
-                  />
-                ) : null}
-                <Icon
-                  className={cn("size-5 shrink-0", isActive && "text-primary")}
-                  aria-hidden
-                />
-                <span className="max-w-full truncate">{link.shortLabel}</span>
-              </Link>
+                label={link.label}
+                shortLabel={link.shortLabel}
+                icon={link.icon}
+                isActive={isNavLinkActive(pathname, link.href)}
+              />
             </li>
-          );
-        })}
-      </ul>
-    </nav>
+          ))}
+          <MoreNavSlot
+            secondaryLinks={secondaryLinks}
+            pathname={pathname}
+            moreOpen={moreOpen}
+            onOpen={() => setMoreOpen(true)}
+          />
+        </ul>
+      </nav>
+
+      <AppMobileMoreSheet
+        open={moreOpen}
+        onOpenChange={setMoreOpen}
+        pathname={pathname}
+        groups={moreNavGroups(role, secondaryLinks)}
+      />
+    </>
   );
 }

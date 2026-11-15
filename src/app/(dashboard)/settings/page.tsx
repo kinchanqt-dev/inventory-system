@@ -1,4 +1,5 @@
 import { requireRole } from "@/lib/session";
+import { appShellSessionProps } from "@/lib/app-shell-session";
 
 import { AppShell, PageToolbar } from "@/components/layout";
 
@@ -13,8 +14,7 @@ export default async function SettingsPage() {
 
   return (
     <AppShell
-      name={session.user.name ?? "Owner"}
-      role={session.user.role}
+      {...appShellSessionProps(session)}
       title="Settings"
       branding={branding}
     >

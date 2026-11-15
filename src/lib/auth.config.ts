@@ -1,5 +1,7 @@
 import type { NextAuthConfig } from "next-auth";
 
+import { evaluateAuthorized } from "@/lib/auth-authorized";
+
 import type { RoleValue } from "@/enums";
 
 function toIdString(value: unknown): string {
@@ -22,19 +24,7 @@ export const authConfig = {
   providers: [],
   callbacks: {
     authorized({ auth, request }) {
-      const { pathname } = request.nextUrl;
-      const isLoggedIn = Boolean(auth?.user);
-      const isLoginPage = pathname.startsWith("/login");
-
-      if (!isLoggedIn && !isLoginPage) {
-        return false;
-      }
-
-      if (isLoggedIn && isLoginPage) {
-        return Response.redirect(new URL("/", request.nextUrl));
-      }
-
-      return true;
+      return evaluateAuthorized(auth, request.nextUrl.pathname, request);
     },
     jwt({ token, user }) {
       if (user) {

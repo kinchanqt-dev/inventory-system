@@ -1,13 +1,13 @@
 "use client";
 
-import Image from "next/image";
-
 import { formatPesos } from "@/lib/money";
 
 import { Badge, TableCell, TableRow } from "@/components/ui";
 
 import { ProductActionsMenu } from "@/features/products/components/product-actions-menu";
+import { ProductThumbnail } from "@/features/products/components/product-thumbnail";
 import { getProductRowView } from "@/features/products/lib/product-row-view";
+import { productActiveBadge } from "@/features/products/lib/product-active-badge";
 
 import type { ProductRowData } from "@/features/products/types/product.types";
 
@@ -17,29 +17,18 @@ interface ProductRowProps {
 
 export function ProductRow({ product }: Readonly<ProductRowProps>) {
   const { quantity, isLow, initials } = getProductRowView(product);
+  const activeBadge = productActiveBadge(product.isActive);
 
   return (
     <TableRow>
       <TableCell className="font-mono text-xs">{product.sku}</TableCell>
       <TableCell>
         <div className="flex items-center gap-3">
-          {product.imagePath ? (
-            <Image
-              src={product.imagePath}
-              alt=""
-              width={40}
-              height={40}
-              className="size-10 rounded-md object-cover"
-              unoptimized
-            />
-          ) : (
-            <span
-              aria-hidden
-              className="flex size-10 items-center justify-center rounded-md bg-muted text-sm font-semibold text-muted-foreground"
-            >
-              {initials}
-            </span>
-          )}
+          <ProductThumbnail
+            imagePath={product.imagePath}
+            initials={initials}
+            size="sm"
+          />
           <span className="font-medium">{product.name}</span>
         </div>
       </TableCell>
@@ -54,9 +43,7 @@ export function ProductRow({ product }: Readonly<ProductRowProps>) {
         ) : null}
       </TableCell>
       <TableCell>
-        <Badge variant={product.isActive ? "default" : "secondary"}>
-          {product.isActive ? "Active" : "Inactive"}
-        </Badge>
+        <Badge variant={activeBadge.variant}>{activeBadge.label}</Badge>
       </TableCell>
       <TableCell className="text-right">
         <ProductActionsMenu product={product} />

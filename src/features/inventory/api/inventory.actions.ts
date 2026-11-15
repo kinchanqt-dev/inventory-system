@@ -2,14 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 
-import { prisma } from "@/lib/prisma";
+import { firstZodIssueMessage } from "@/lib/first-zod-issue";
 import { requireRole } from "@/lib/session";
+import { createClient } from "@/lib/supabase/server";
 
-import { nextStockQuantity } from "@/features/inventory/lib/next-stock-quantity";
+import { performStockAdjust } from "@/features/inventory/lib/perform-stock-adjust";
 import { stockAdjustSchema } from "@/features/inventory/schemas/stock-adjust.schema";
 
 export async function adjustStockAction(formData: FormData) {
   const session = await requireRole(["OWNER"]);
+  const orgId = session.organization.id;
 
   const parsed = stockAdjustSchema.safeParse({
     productId: formData.get("productId"),
@@ -19,50 +21,24 @@ export async function adjustStockAction(formData: FormData) {
   });
 
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid adjustment" };
+    return {
+      error: firstZodIssueMessage(parsed.error.issues, "Invalid adjustment"),
+    };
   }
 
-  const { productId, type, quantity, reason } = parsed.data;
+  const supabase = await createClient();
+  const result = await performStockAdjust({
+    supabase,
+    orgId,
+    userId: session.user.id,
+    productId: parsed.data.productId,
+    type: parsed.data.type,
+    quantity: parsed.data.quantity,
+    reason: parsed.data.reason,
+  });
 
-  try {
-    await prisma.$transaction(async (tx) => {
-      const stock = await tx.stockItem.findUnique({
-        where: { productId },
-      });
-
-      if (!stock) {
-        throw new Error("Stock record not found");
-      }
-
-      const updatedQuantity = nextStockQuantity({
-        currentQuantity: stock.quantity,
-        type,
-        quantity,
-      });
-
-      if (updatedQuantity < 0) {
-        throw new Error("Insufficient stock for this adjustment");
-      }
-
-      await tx.stockItem.update({
-        where: { productId },
-        data: { quantity: updatedQuantity },
-      });
-
-      await tx.stockMovement.create({
-        data: {
-          productId,
-          type,
-          quantity: type === "ADJUST" ? updatedQuantity : quantity,
-          reason,
-          userId: session.user.id,
-        },
-      });
-    });
-  } catch (error) {
-    return {
-      error: error instanceof Error ? error.message : "Could not adjust stock",
-    };
+  if ("error" in result) {
+    return { error: result.error };
   }
 
   revalidatePath("/inventory");

@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
+
 import { ProductIdentityFields } from "@/features/products/components/product-identity-fields";
 import { ProductImageField } from "@/features/products/components/product-image-field";
 import { ProductPricingFields } from "@/features/products/components/product-pricing-fields";
@@ -15,6 +17,14 @@ interface ProductFormFieldsProps {
   onCategoryChange: (value: string) => void;
   isEdit: boolean;
   product?: ProductFormValues;
+  computedCostCents?: number | null;
+  priceValue?: string;
+  onPriceChange?: (value: string) => void;
+  quantityValue?: string;
+  onQuantityChange?: (value: string) => void;
+  maxMakeable?: number | null;
+  quantityError?: string | null;
+  beforePricing?: ReactNode;
 }
 
 export function ProductFormFields({
@@ -23,6 +33,14 @@ export function ProductFormFields({
   onCategoryChange,
   isEdit,
   product,
+  computedCostCents,
+  priceValue,
+  onPriceChange,
+  quantityValue,
+  onQuantityChange,
+  maxMakeable,
+  quantityError,
+  beforePricing,
 }: Readonly<ProductFormFieldsProps>) {
   return (
     <div className="space-y-6">
@@ -56,17 +74,29 @@ export function ProductFormFields({
         />
       </section>
 
+      {beforePricing}
+
       <section className="space-y-4 rounded-xl border border-border/80 p-4 sm:p-5">
         <div>
           <h2 className="text-base font-semibold tracking-tight">
             Pricing &amp; stock
           </h2>
           <p className="text-sm text-muted-foreground">
-            Selling price, cost, and when to warn that stock is running low.
+            Selling price and stock alerts. Food cost comes from the recipe.
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <ProductPricingFields isEdit={isEdit} product={product} />
+          <ProductPricingFields
+            isEdit={isEdit}
+            product={product}
+            computedCostCents={computedCostCents}
+            priceValue={priceValue}
+            onPriceChange={onPriceChange}
+            quantityValue={quantityValue}
+            onQuantityChange={onQuantityChange}
+            maxMakeable={maxMakeable}
+            quantityError={quantityError}
+          />
         </div>
       </section>
     </div>

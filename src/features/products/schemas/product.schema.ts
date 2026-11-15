@@ -12,4 +12,5 @@ export const productSchema = z.object({
   quantity: z.coerce.number().int().min(0).default(0),
   reorderLevel: z.coerce.number().int().min(0).default(5),
   isActive: z.coerce.boolean().default(true),
+  sendsToKitchen: z.coerce.boolean().default(true),
 });

@@ -185,9 +185,18 @@ export function ImageDropzone({
 }: Readonly<ImageDropzoneProps>) {
   const generatedId = useId();
   const inputId = id ?? generatedId;
-  const dropzone = useImageDropzoneState({ onRemoveChange });
+  const {
+    inputRef,
+    isDragging,
+    setIsDragging,
+    selectedPreview,
+    selectedName,
+    localError,
+    clearSelection,
+    applyFile,
+  } = useImageDropzoneState({ onRemoveChange });
   const previewSrc = resolvePreviewSrc(
-    dropzone.selectedPreview,
+    selectedPreview,
     existingPath,
     removeChecked,
   );
@@ -201,26 +210,26 @@ export function ImageDropzone({
           src={previewSrc}
           alt={existingAlt}
           fit={previewFit}
-          onClear={dropzone.selectedPreview ? dropzone.clearSelection : undefined}
+          onClear={selectedPreview ? clearSelection : undefined}
         />
       ) : null}
 
       <DropSurface
         inputId={inputId}
-        isDragging={dropzone.isDragging}
-        selectedName={dropzone.selectedName}
-        onDragState={dropzone.setIsDragging}
-        onDropFile={dropzone.applyFile}
+        isDragging={isDragging}
+        selectedName={selectedName}
+        onDragState={setIsDragging}
+        onDropFile={applyFile}
       />
 
       <input
-        ref={dropzone.inputRef}
+        ref={inputRef}
         id={inputId}
         name={name}
         type="file"
         accept="image/png,image/jpeg,image/webp"
         className="sr-only"
-        onChange={(event) => dropzone.applyFile(event.target.files?.[0])}
+        onChange={(event) => applyFile(event.target.files?.[0])}
       />
 
       <DropzoneFooter
@@ -228,12 +237,12 @@ export function ImageDropzone({
         removeInputName={removeInputName}
         removeLabel={removeLabel}
         removeChecked={removeChecked}
-        localError={dropzone.localError}
+        localError={localError}
         hint={hint}
         onRemoveToggle={(checked) => {
           onRemoveChange?.(checked);
           if (checked) {
-            dropzone.clearSelection();
+            clearSelection();
           }
         }}
       />

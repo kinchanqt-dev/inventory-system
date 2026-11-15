@@ -25,11 +25,12 @@ describe("product write helpers", () => {
       barcode: null,
       name: "Rice Meal A",
       description: "Hot meal",
-      categoryId: "cat-1",
-      priceCents: 8900,
-      costCents: 4500,
+      category_id: "cat-1",
+      price_cents: 8900,
+      cost_cents: 4500,
       unit: "pc",
-      isActive: true,
+      is_active: true,
+      sends_to_kitchen: true,
     });
   });
 

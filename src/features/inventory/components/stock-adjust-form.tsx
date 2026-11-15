@@ -2,10 +2,9 @@
 
 import { useState, useTransition } from "react";
 
+import { AdjustmentFormDialogFooter } from "@/components/shared/adjustment-form-dialog-footer";
+
 import {
-  Button,
-  DialogClose,
-  DialogFooter,
   Input,
   Label,
   Select,
@@ -104,16 +103,7 @@ export function StockAdjustForm({
 
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
-      <DialogFooter>
-        <DialogClose
-          render={<Button type="button" variant="outline" className="min-h-11" />}
-        >
-          Cancel
-        </DialogClose>
-        <Button type="submit" disabled={isPending} className="min-h-11">
-          {isPending ? "Saving..." : "Save adjustment"}
-        </Button>
-      </DialogFooter>
+      <AdjustmentFormDialogFooter isPending={isPending} />
     </form>
   );
 }
