@@ -1,33 +1,50 @@
-import { readFile } from "node:fs/promises";
-import path from "node:path";
-
 import { ImageResponse } from "next/og";
 import { connection } from "next/server";
 
 import { getShopBranding } from "@/features/settings/api/settings.queries";
 
 function mimeFromLogoPath(logoPath: string): string {
-  if (logoPath.endsWith(".png")) return "image/png";
-  if (logoPath.endsWith(".webp")) return "image/webp";
+  if (logoPath.includes(".png")) return "image/png";
+  if (logoPath.includes(".webp")) return "image/webp";
   return "image/jpeg";
 }
 
-function absolutePublicPath(publicPath: string): string {
-  return path.join(process.cwd(), "public", publicPath.replace(/^\//, ""));
+function isRemoteLogoPath(logoPath: string) {
+  return logoPath.startsWith("http://") || logoPath.startsWith("https://");
 }
 
-async function logoFileResponse(logoPath: string): Promise<Response | null> {
+async function fetchRemoteLogo(logoPath: string): Promise<Response | null> {
   try {
-    const bytes = await readFile(absolutePublicPath(logoPath));
+    const response = await fetch(logoPath, { cache: "no-store" });
+    if (!response.ok) {
+      return null;
+    }
+    const bytes = await response.arrayBuffer();
     return new Response(bytes, {
       headers: {
-        "Content-Type": mimeFromLogoPath(logoPath),
+        "Content-Type":
+          response.headers.get("content-type") ?? mimeFromLogoPath(logoPath),
         "Cache-Control": "public, max-age=0, must-revalidate",
       },
     });
   } catch {
     return null;
   }
+}
+
+async function logoFileResponse(logoPath: string): Promise<Response | null> {
+  if (!isRemoteLogoPath(logoPath)) {
+    return null;
+  }
+  return fetchRemoteLogo(logoPath);
+}
+
+function shopInitial(shopTitle: string) {
+  const initial = shopTitle.trim().charAt(0).toUpperCase();
+  if (initial) {
+    return initial;
+  }
+  return "S";
 }
 
 export async function shopIconResponse(size: number): Promise<Response> {
@@ -41,7 +58,7 @@ export async function shopIconResponse(size: number): Promise<Response> {
     }
   }
 
-  const initial = branding.shopTitle.trim().charAt(0).toUpperCase() || "S";
+  const initial = shopInitial(branding.shopTitle);
 
   return new ImageResponse(
     (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { DEFAULT_LIST_PAGE_SIZE, paginateItems } from "@/lib/paginate";
 
@@ -14,6 +14,8 @@ import { TableCell, TableRow } from "@/components/ui";
 
 import { ProductListCard } from "@/features/products/components/product-list-card";
 import { ProductRow } from "@/features/products/components/product-row";
+import { filterProductsList } from "@/features/products/lib/filter-products-list";
+import { productsListEmptyMessage } from "@/features/products/lib/products-list-empty-message";
 
 import type { ProductRowData } from "@/features/products/types/product.types";
 
@@ -35,30 +37,17 @@ export function ProductsTable({ products }: Readonly<ProductsTableProps>) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
 
-  const filtered = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    if (!normalized) return products;
-
-    return products.filter(
-      (product) =>
-        product.name.toLowerCase().includes(normalized) ||
-        product.sku.toLowerCase().includes(normalized) ||
-        (product.category?.name ?? "").toLowerCase().includes(normalized),
-    );
-  }, [products, query]);
-
-  useEffect(() => {
-    setPage(1);
-  }, [query]);
+  const filtered = useMemo(
+    () => filterProductsList(products, query),
+    [products, query],
+  );
 
   const pageItems = paginateItems(filtered, page, DEFAULT_LIST_PAGE_SIZE);
-
-  let emptyMessage: string | null = null;
-  if (products.length === 0) {
-    emptyMessage = "No products yet. Add your first item to start selling.";
-  } else if (filtered.length === 0) {
-    emptyMessage = `No products match “${query.trim()}”`;
-  }
+  const emptyMessage = productsListEmptyMessage(
+    products.length,
+    filtered.length,
+    query,
+  );
 
   const tableBody = emptyMessage ? (
     <TableRow>
@@ -89,7 +78,10 @@ export function ProductsTable({ products }: Readonly<ProductsTableProps>) {
     <div className="space-y-3">
       <TableSearchToolbar
         value={query}
-        onChange={setQuery}
+        onChange={(value) => {
+          setQuery(value);
+          setPage(1);
+        }}
         placeholder="Search by name, item code, or category"
         aria-label="Search products"
         matchedCount={filtered.length}

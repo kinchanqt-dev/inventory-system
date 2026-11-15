@@ -1,27 +1,13 @@
-import NextAuth from "next-auth";
+import { type NextRequest } from "next/server";
 
-import { authConfig } from "@/lib/auth.config";
-import {
-  getBasicAuthCredentials,
-  isAuthorizedBasicAuth,
-  unauthorizedBasicResponse,
-} from "@/lib/basic-auth";
+import { updateSession } from "@/lib/supabase/middleware";
 
-import type { NextAuthRequest } from "next-auth";
-
-const { auth } = NextAuth(authConfig);
-
-export default auth((request: NextAuthRequest) => {
-  if (
-    getBasicAuthCredentials() &&
-    !isAuthorizedBasicAuth(request.headers.get("authorization"))
-  ) {
-    return unauthorizedBasicResponse();
-  }
-});
+export async function proxy(request: NextRequest) {
+  return updateSession(request);
+}
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|icon|apple-icon|uploads/).*)",
+    "/((?!_next/static|_next/image|favicon.ico|icon|apple-icon|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

@@ -1,0 +1,15 @@
+# Minimal config for local CLI reference. Remote project is the source of truth for v1.
+
+[project]
+id = "ywcxjeyeiepiksywcdmm"
+
+[api]
+enabled = true
+
+[db]
+major_version = 15
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/**"]

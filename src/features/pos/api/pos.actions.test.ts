@@ -1,13 +1,28 @@
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/session", () => ({
-  requireSession: vi.fn(async () => ({ user: { id: "u1", role: "OWNER" } })),
+  requireSession: vi.fn(async () => ({
+    user: { id: "u1", role: "OWNER" },
+    organization: { id: "org-1" },
+  })),
 }));
 
-vi.mock("@/lib/prisma", () => ({
-  prisma: {
-    $transaction: vi.fn(),
-  },
+vi.mock("@/lib/supabase/server", () => ({
+  createClient: vi.fn(async () => ({
+    from: vi.fn(() => ({
+      select: vi.fn().mockReturnThis(),
+      insert: vi.fn().mockReturnThis(),
+      update: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      in: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn(),
+      single: vi.fn(),
+    })),
+  })),
+}));
+
+vi.mock("@/features/kitchen/api/kitchen.actions", () => ({
+  createKitchenTicketForSale: vi.fn(async () => ({ skipped: true })),
 }));
 
 vi.mock("next/cache", () => ({

@@ -1,8 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/session", () => ({
-  requireSession: vi.fn(async () => ({
+  requireRole: vi.fn(async () => ({
     user: { id: "u1", name: "Owner", role: "OWNER" },
+    organization: { id: "org-1", name: "Test Org" },
+    isPlatformAdmin: false,
+    isSupportMode: false,
   })),
 }));
 

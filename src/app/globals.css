@@ -9,7 +9,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-fraunces), ui-serif, Georgia, serif;
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-accent: var(--sidebar-accent);
   --color-sidebar-foreground: var(--sidebar-foreground);
@@ -40,6 +40,10 @@
   --max-width-dialog: calc(100% - 2rem);
   --grid-template-columns-card-action: 1fr auto;
   --grid-template-columns-pos: 1.45fr 1fr;
+  --grid-template-columns-bom-recipe: 120px 1fr 120px 120px auto;
+  --grid-template-columns-bom-sub: 1fr 120px 120px auto;
+  --max-width-kitchen: 1600px;
+  --min-height-kitchen-column: 50vh;
   --aspect-product-tile: 4 / 3;
   --text-nav-xs: 0.6875rem;
   --max-height-dialog-viewport: 90dvh;
@@ -47,43 +51,44 @@
 }
 
 :root {
-  --background: var(--brand-background, #f7f4ef);
-  --foreground: var(--brand-foreground, #1f1b18);
-  --card: color-mix(in oklab, var(--brand-background, #f7f4ef) 88%, white);
-  --card-foreground: var(--brand-foreground, #1f1b18);
-  --popover: color-mix(in oklab, var(--brand-background, #f7f4ef) 92%, white);
-  --popover-foreground: var(--brand-foreground, #1f1b18);
-  --primary: var(--brand-primary, #1a1a1a);
+  --background: var(--brand-background, #f2f5f3);
+  --foreground: var(--brand-foreground, #18201c);
+  --card: color-mix(in oklab, var(--brand-background, #f2f5f3) 82%, white);
+  --card-foreground: var(--brand-foreground, #18201c);
+  --popover: color-mix(in oklab, var(--brand-background, #f2f5f3) 88%, white);
+  --popover-foreground: var(--brand-foreground, #18201c);
+  --primary: var(--brand-primary, #1a2a24);
   --primary-foreground: var(--brand-primary-foreground, #ffffff);
-  --secondary: color-mix(in oklab, var(--brand-background, #f7f4ef) 82%, black);
-  --secondary-foreground: var(--brand-foreground, #1f1b18);
-  --muted: color-mix(in oklab, var(--brand-background, #f7f4ef) 86%, black);
+  --secondary: color-mix(in oklab, var(--brand-background, #f2f5f3) 78%, black);
+  --secondary-foreground: var(--brand-foreground, #18201c);
+  --muted: color-mix(in oklab, var(--brand-background, #f2f5f3) 84%, black);
   --muted-foreground: color-mix(
     in oklab,
-    var(--brand-foreground, #1f1b18) 62%,
-    var(--brand-background, #f7f4ef)
+    var(--brand-foreground, #18201c) 58%,
+    var(--brand-background, #f2f5f3)
   );
   --accent: var(--brand-accent, #2f5d50);
   --accent-foreground: var(--brand-accent-foreground, #ffffff);
   --destructive: oklch(0.55 0.2 25);
-  --border: color-mix(in oklab, var(--brand-foreground, #1f1b18) 12%, transparent);
-  --input: color-mix(in oklab, var(--brand-foreground, #1f1b18) 12%, transparent);
-  --ring: var(--brand-primary, #1a1a1a);
-  --radius: 0.75rem;
-  --sidebar: color-mix(in oklab, var(--brand-background, #f7f4ef) 94%, black);
-  --sidebar-foreground: var(--brand-foreground, #1f1b18);
+  --border: color-mix(in oklab, var(--brand-foreground, #18201c) 12%, transparent);
+  --input: color-mix(in oklab, var(--brand-foreground, #18201c) 12%, transparent);
+  --ring: var(--brand-primary, #1a2a24);
+  --radius: 0.85rem;
+  --sidebar: color-mix(in oklab, var(--brand-background, #f2f5f3) 92%, black);
+  --sidebar-foreground: var(--brand-foreground, #18201c);
   --sidebar-accent: var(--brand-accent, #2f5d50);
   --sidebar-accent-foreground: var(--brand-accent-foreground, #ffffff);
   --login-surface: linear-gradient(
-    165deg,
-    color-mix(in oklab, var(--brand-background, #f7f4ef) 90%, white),
-    var(--brand-background, #f7f4ef) 55%,
-    color-mix(in oklab, var(--brand-accent, #2f5d50) 8%, var(--brand-background, #f7f4ef))
+    155deg,
+    color-mix(in oklab, var(--brand-background, #f2f5f3) 78%, white) 0%,
+    var(--brand-background, #f2f5f3) 42%,
+    color-mix(in oklab, var(--brand-accent, #2f5d50) 14%, var(--brand-background, #f2f5f3)) 100%
   );
   --pos-surface: linear-gradient(
     180deg,
-    color-mix(in oklab, var(--brand-background, #f7f4ef) 94%, white),
-    var(--brand-background, #f7f4ef)
+    color-mix(in oklab, var(--brand-background, #f2f5f3) 88%, white),
+    var(--brand-background, #f2f5f3) 55%,
+    color-mix(in oklab, var(--brand-accent, #2f5d50) 6%, var(--brand-background, #f2f5f3))
   );
   color-scheme: light;
 }
@@ -154,6 +159,49 @@
   }
 }
 
+::view-transition {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(.page-exit) {
+    animation: 160ms ease-out both page-fade-out;
+  }
+
+  ::view-transition-new(.page-enter) {
+    animation:
+      220ms ease-out 80ms both page-fade-in,
+      280ms ease-out both page-rise;
+  }
+
+  @keyframes page-fade-out {
+    to {
+      opacity: 0;
+      filter: blur(2px);
+    }
+  }
+
+  @keyframes page-fade-in {
+    from {
+      opacity: 0;
+      filter: blur(2px);
+    }
+    to {
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
+
+  @keyframes page-rise {
+    from {
+      transform: translateY(8px);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -168,6 +216,8 @@
   ::view-transition-old(*),
   ::view-transition-new(*) {
     animation: none;
+    animation-duration: 0s;
+    animation-delay: 0s;
   }
 }
 
@@ -175,19 +225,42 @@
   background-image: var(--login-surface);
 }
 
+@utility auth-glow {
+  background:
+    radial-gradient(
+      42rem 28rem at 12% 18%,
+      color-mix(in oklab, var(--brand-accent, #2f5d50) 18%, transparent),
+      transparent 68%
+    ),
+    radial-gradient(
+      36rem 24rem at 88% 78%,
+      color-mix(in oklab, var(--brand-accent, #2f5d50) 12%, transparent),
+      transparent 70%
+    );
+}
+
 @utility login-dot-pattern {
   background-image: radial-gradient(
     circle at 1px 1px,
-    color-mix(in oklab, var(--brand-foreground, #1f1b18) 16%, transparent) 1px,
+    color-mix(in oklab, var(--brand-foreground, #18201c) 34%, transparent) 1.15px,
     transparent 0
   );
-  background-size: 20px 20px;
-  opacity: 0.55;
+  background-size: 18px 18px;
+  opacity: 0.7;
   mask-image: radial-gradient(
-    ellipse 85% 70% at 50% 45%,
-    black 35%,
-    transparent 85%
+    ellipse 95% 80% at 50% 42%,
+    black 28%,
+    transparent 88%
   );
+}
+
+.dark .login-dot-pattern {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    color-mix(in oklab, white 28%, transparent) 1.15px,
+    transparent 0
+  );
+  opacity: 0.45;
 }
 
 @utility bg-pos-surface {
@@ -216,4 +289,26 @@
 
 @utility translate-tooltip-arrow {
   translate: 0 var(--tooltip-arrow-nudge);
+}
+
+@media print {
+  /* Unlayered + `body` prefix beats Tailwind utilities without !important. */
+  body * {
+    visibility: hidden;
+  }
+
+  body [data-sale-receipt-print],
+  body [data-sale-receipt-print] * {
+    visibility: visible;
+  }
+
+  body [data-sale-receipt-print] {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    max-width: 28rem;
+    padding: 1rem;
+    background: white;
+    color: black;
+  }
 }

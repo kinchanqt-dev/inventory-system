@@ -1,40 +1,23 @@
-import { cacheLife, cacheTag } from "next/cache";
-
-import { prisma } from "@/lib/prisma";
+import { resolveActiveOrganization, getAuthUser } from "@/lib/session";
 
 import {
-  DEFAULT_BRANDING,
-  normalizeBranding,
-} from "@/features/settings/lib/normalize-branding";
+  brandingFromOrganization,
+  defaultShopBranding,
+} from "@/features/settings/lib/resolve-shop-branding";
 
 import type { ShopBranding } from "@/features/settings/types/settings.types";
 
-export const SHOP_BRANDING_CACHE_TAG = "shop-branding";
-
-async function readShopBranding(): Promise<ShopBranding> {
-  "use cache";
-  cacheTag(SHOP_BRANDING_CACHE_TAG);
-  cacheLife("hours");
-
-  const settings = await prisma.shopSettings.findUnique({
-    where: { id: "default" },
-  });
-
-  if (!settings) {
-    return DEFAULT_BRANDING;
+/** Branding for the active organization, or defaults when logged out. */
+export async function getShopBranding(): Promise<ShopBranding> {
+  const user = await getAuthUser();
+  if (!user) {
+    return defaultShopBranding();
   }
 
-  return normalizeBranding({
-    shopTitle: settings.shopTitle,
-    tagline: settings.tagline,
-    logoPath: settings.logoPath,
-    primaryColor: settings.primaryColor,
-    accentColor: settings.accentColor,
-    backgroundColor: settings.backgroundColor,
-  });
-}
+  const active = await resolveActiveOrganization(user.id);
+  if (!active) {
+    return defaultShopBranding();
+  }
 
-/** Always normalize so stale cache entries without newer fields stay safe. */
-export async function getShopBranding(): Promise<ShopBranding> {
-  return normalizeBranding(await readShopBranding());
+  return brandingFromOrganization(active.organization);
 }

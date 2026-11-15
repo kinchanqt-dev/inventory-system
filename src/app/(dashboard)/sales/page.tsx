@@ -1,6 +1,7 @@
 import Link from "next/link";
 
-import { requireSession } from "@/lib/session";
+import { requireRole } from "@/lib/session";
+import { appShellSessionProps } from "@/lib/app-shell-session";
 
 import { AppShell, PageToolbar } from "@/components/layout";
 import { Button } from "@/components/ui";
@@ -11,7 +12,7 @@ import { getShopBranding } from "@/features/settings";
 export const instant = false;
 
 export default async function SalesPage() {
-  const session = await requireSession();
+  const session = await requireRole(["OWNER", "CASHIER"]);
   const [sales, branding] = await Promise.all([
     listSalesHistory(250),
     getShopBranding(),
@@ -19,8 +20,7 @@ export default async function SalesPage() {
 
   return (
     <AppShell
-      name={session.user.name ?? "User"}
-      role={session.user.role}
+      {...appShellSessionProps(session)}
       title="Sales"
       branding={branding}
     >
@@ -36,7 +36,7 @@ export default async function SalesPage() {
           </Button>
         }
       />
-      <SalesTable sales={sales} />
+      <SalesTable sales={sales} shopName={branding.shopTitle} />
     </AppShell>
   );
 }

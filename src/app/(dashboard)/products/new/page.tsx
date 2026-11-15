@@ -1,24 +1,34 @@
 import { requireRole } from "@/lib/session";
+import { appShellSessionProps } from "@/lib/app-shell-session";
 
 import { AppShell, PageToolbar } from "@/components/layout";
 import { PageBreadcrumb } from "@/components/shared";
 
-import { listCategories, ProductForm } from "@/features/products";
+import { listIngredients } from "@/features/ingredients";
+import { listMenuCategories } from "@/features/products";
+import { ProductCreateForm } from "@/features/products/components/product-create-form";
+import {
+  foodCostSettingsFromOrg,
+  toRecipeEditorOptions,
+} from "@/features/products/lib/load-edit-product-page";
 import { getShopBranding } from "@/features/settings";
+import { listSubRecipes } from "@/features/sub-recipes";
 
 export const instant = false;
 
 export default async function NewProductPage() {
   const session = await requireRole(["OWNER"]);
-  const [categories, branding] = await Promise.all([
-    listCategories(),
+  const [categories, branding, ingredients, subRecipes] = await Promise.all([
+    listMenuCategories(),
     getShopBranding(),
+    listIngredients(),
+    listSubRecipes(),
   ]);
+  const recipeOptions = toRecipeEditorOptions(ingredients, subRecipes);
 
   return (
     <AppShell
-      name={session.user.name ?? "Owner"}
-      role={session.user.role}
+      {...appShellSessionProps(session)}
       title="Add product"
       branding={branding}
     >
@@ -29,10 +39,14 @@ export default async function NewProductPage() {
         ]}
       />
       <PageToolbar
-        description="Add a new item with price, optional photo, and starting stock."
-        hint="Pick a clear item code so staff can find it quickly at the counter."
+        description="Set price, stock, and the recipe ingredients in one step."
+        hint="Food cost updates live as you add ingredient or sub-recipe lines."
       />
-      <ProductForm categories={categories} />
+      <ProductCreateForm
+        categories={categories}
+        foodCostSettings={foodCostSettingsFromOrg(session.organization)}
+        {...recipeOptions}
+      />
     </AppShell>
   );
 }

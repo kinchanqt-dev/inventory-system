@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { requireRole } from "@/lib/session";
+import { appShellSessionProps } from "@/lib/app-shell-session";
 
 import { AppShell, PageToolbar } from "@/components/layout";
 import { PageBreadcrumb } from "@/components/shared";
@@ -20,8 +21,7 @@ export default async function ProductsPage() {
 
   return (
     <AppShell
-      name={session.user.name ?? "Owner"}
-      role={session.user.role}
+      {...appShellSessionProps(session)}
       title="Products"
       branding={branding}
     >
