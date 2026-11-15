@@ -1,67 +1,68 @@
 # Inventory POS
 
-Local full-stack inventory + POS for a small food business.
+Multi-tenant inventory + POS for food businesses. Each shop gets its own organization, staff roles, recipes, and kitchen flow.
 
 ## Stack
 
 - Next.js (App Router)
-- shadcn/ui
-- Prisma 7 + MySQL
-- Auth.js (credentials)
+- Supabase (Auth, Postgres, Storage, RLS)
+- shadcn/ui + Tailwind CSS
+- pnpm
 
 ## Quick start
 
 ```bash
-# 1. Start MySQL
-docker compose up -d
+# 1. Install deps
+pnpm install
 
-# 2. Install deps
-npm install
-
-# 3. Copy env (already present as .env for local)
+# 2. Configure env
 cp .env.example .env
+# Fill NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+# Optionally set DATABASE_URL (and SUPABASE_SERVICE_ROLE_KEY for admin scripts)
 
-# 4. Migrate + seed
-npx prisma migrate dev
-npx prisma db seed
+# 3. Apply SQL migrations (needs DATABASE_URL)
+pnpm db:migrate
 
-# 5. Run app
-npm run dev
+# 4. Run the app
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
 
-### Seeded logins
+### First login
 
-| Email | Password | Role |
-| --- | --- | --- |
-| owner@local.dev | password123 | OWNER |
-| cashier@local.dev | password123 | CASHIER |
+There is no fixed seed user. Register a new account, create an organization on onboarding, then invite staff from **Team** (Owner).
 
-## Features in this MVP
+| Role | Typical access |
+| --- | --- |
+| OWNER | Catalog, inventory, recipes, settings, team, POS |
+| CASHIER | POS, sales |
+| COOK | Kitchen board |
 
-- Product catalog (SKU-only, optional product images)
-- Shop branding (title, logo, colors) via Owner Settings
-- Inventory adjustments with reasons
-- Tablet-friendly POS checkout with manual payment methods: Cash, QRPh, GCash, Maya, Card, Other
+## Features
+
+- Multi-tenant orgs with RLS isolation
+- Product catalog (SKU, images, categories) with recipe / food-cost BOM
+- Ingredients, sub-recipes, and opening-stock guidance from makeable portions
+- Inventory adjustments with movement history
+- Tablet-friendly POS (Cash, QRPh, GCash, Maya, Card, Other)
+- Checkout deducts finished-goods stock and recipe ingredients
+- Kitchen tickets for cook-facing prep
 - Sales history + dashboard snapshot
-- Role-aware navigation (cashier focuses on POS/sales)
-- Optional HTTP Basic Auth gate for protecting a LAN/server install
+- Shop branding (title, logo, colors, currency)
+- Optional platform-admin support console
 
-## HTTP Basic Auth (shop server)
-
-Set both variables in `.env` on the machine that hosts the app:
+## Quality checks
 
 ```bash
-BASIC_AUTH_USER="shop"
-BASIC_AUTH_PASSWORD="choose-a-strong-password"
+pnpm typecheck
+pnpm test
+pnpm quality   # typecheck + fallow + test
 ```
-
-Browsers will prompt once, then staff still sign in with Owner/Cashier accounts. Leave both empty for local development without the prompt. Prefer Tailscale/VPN or TLS termination (nginx/Caddy) for anything beyond a trusted LAN.
 
 ## Notes
 
-- Money is stored as integer centavos
-- Stock changes happen inside Prisma transactions with sales
-- Uploaded logos/images live under `public/uploads/` (gitignored)
+- Money is stored as integer centavos (₱)
+- Uploaded logos/product images go to the Supabase `uploads` storage bucket
 - Online payment gateways are intentionally out of scope for now
+- See `.env.example` for all supported environment variables
