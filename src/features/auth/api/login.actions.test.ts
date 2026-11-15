@@ -1,25 +1,31 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const signIn = vi.fn();
+const signInWithPassword = vi.fn();
 const signOut = vi.fn();
 
-vi.mock("@/lib/auth", () => ({
-  signIn,
-  signOut,
+vi.mock("@/lib/supabase/server", () => ({
+  createClient: vi.fn(async () => ({
+    auth: {
+      signInWithPassword,
+      signOut,
+    },
+  })),
+}));
+
+vi.mock("@/lib/session", () => ({
+  clearSupportOrganizationId: vi.fn(),
+  ensurePlatformAdminMetadata: vi.fn(),
+  ensureUserProfile: vi.fn(),
 }));
 
 vi.mock("next/navigation", () => ({
   redirect: vi.fn(),
 }));
 
-vi.mock("next-auth", () => ({
-  AuthError: class AuthError extends Error {},
-}));
-
 describe("login actions", () => {
   beforeEach(() => {
     vi.resetModules();
-    signIn.mockReset();
+    signInWithPassword.mockReset();
     signOut.mockReset();
   });
 
