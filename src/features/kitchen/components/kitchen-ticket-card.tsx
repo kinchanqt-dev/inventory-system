@@ -125,7 +125,7 @@ export function KitchenTicketCard({
   return (
     <article
       className={cn(
-        "flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm",
+        "flex flex-col gap-3 rounded-lg border bg-card p-4 shadow-sm",
         ticketBorderClass(ticket.status),
       )}
     >

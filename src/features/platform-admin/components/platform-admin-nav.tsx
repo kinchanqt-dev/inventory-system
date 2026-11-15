@@ -43,7 +43,7 @@ function adminNavListClass(vertical: boolean) {
 
 function adminNavLinkClass(vertical: boolean, isActive: boolean) {
   return cn(
-    "inline-flex min-h-11 items-center gap-2.5 rounded-xl px-3 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+    "inline-flex min-h-11 items-center gap-2.5 rounded-lg px-3 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
     vertical && "w-full",
     isActive
       ? "bg-primary font-medium text-primary-foreground shadow-sm"

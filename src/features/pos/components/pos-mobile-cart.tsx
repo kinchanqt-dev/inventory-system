@@ -40,7 +40,7 @@ export function PosMobileCart({
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent
           side="bottom"
-          className="max-h-dialog-viewport overflow-y-auto rounded-t-2xl p-0 md:hidden"
+          className="max-h-dialog-viewport overflow-y-auto rounded-t-lg p-0 md:hidden"
         >
           <SheetHeader className="sr-only">
             <SheetTitle>Cart and checkout</SheetTitle>

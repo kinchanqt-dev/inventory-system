@@ -14,7 +14,7 @@ export function OrgMembersList({
   }
 
   return (
-    <ul className="divide-y rounded-xl border">
+    <ul className="divide-y rounded-lg border">
       {members.map((member) => (
         <li
           key={member.id}

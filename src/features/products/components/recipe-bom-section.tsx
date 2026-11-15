@@ -32,7 +32,7 @@ export function RecipeBomSection({
   foodCostSettings,
 }: Readonly<RecipeBomSectionProps>) {
   return (
-    <section className="space-y-4 rounded-xl border border-border/80 p-4 sm:p-5">
+    <section className="space-y-4 rounded-lg border border-border/80 p-4 sm:p-5">
       <div>
         <h2 className="text-base font-semibold tracking-tight">{title}</h2>
         <p className="text-sm text-muted-foreground">{description}</p>

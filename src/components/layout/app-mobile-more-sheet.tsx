@@ -22,7 +22,7 @@ interface AppMobileMoreSheetProps {
 
 function sheetLinkClass(isActive: boolean) {
   return cn(
-    "inline-flex min-h-11 w-full items-center gap-2.5 rounded-xl px-3 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+    "inline-flex min-h-11 w-full items-center gap-2.5 rounded-lg px-3 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
     isActive
       ? "bg-primary font-medium text-primary-foreground"
       : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -37,7 +37,7 @@ export function AppMobileMoreSheet({
 }: Readonly<AppMobileMoreSheetProps>) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="gap-0 rounded-t-2xl pb-safe md:hidden">
+      <SheetContent side="bottom" className="gap-0 rounded-t-lg pb-safe md:hidden">
         <SheetHeader className="border-b border-border/60">
           <SheetTitle>More</SheetTitle>
         </SheetHeader>

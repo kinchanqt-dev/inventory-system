@@ -1,12 +1,16 @@
-import { requireSession } from "@/lib/session";
+import { Suspense } from "react";
 
-export const instant = false;
+import { AppShellSkeleton } from "@/components/layout/app-shell-skeleton";
+import { DashboardAppShell } from "@/components/layout/dashboard-app-shell";
 
-export default async function DashboardGroupLayout({
+export default function DashboardGroupLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
-  await requireSession();
-  return children;
+}>) {
+  return (
+    <Suspense fallback={<AppShellSkeleton />}>
+      <DashboardAppShell>{children}</DashboardAppShell>
+    </Suspense>
+  );
 }

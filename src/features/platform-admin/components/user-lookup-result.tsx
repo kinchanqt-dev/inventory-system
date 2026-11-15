@@ -14,7 +14,7 @@ export function UserLookupResult({
   const isBanned = Boolean(lookedUp.bannedUntil);
 
   return (
-    <div className="space-y-5 rounded-xl border p-4">
+    <div className="space-y-5 rounded-lg border p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-lg font-semibold">{lookedUp.name}</p>

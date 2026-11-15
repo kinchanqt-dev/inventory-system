@@ -41,7 +41,7 @@ interface PosCartPanelProps {
 function defaultCartPanelClass(className: string | undefined) {
   return (
     className ??
-    "flex h-fit flex-col gap-4 rounded-2xl border border-border/70 bg-card/95 p-4 shadow-[0_18px_40px_-28px_rgba(24,32,28,0.45)] backdrop-blur-sm md:sticky md:top-4 md:p-5"
+    "flex h-fit flex-col gap-4 rounded-lg border border-border/70 bg-card/95 p-4 shadow-[0_18px_40px_-28px_rgba(24,32,28,0.45)] backdrop-blur-sm md:sticky md:top-4 md:p-5"
   );
 }
 

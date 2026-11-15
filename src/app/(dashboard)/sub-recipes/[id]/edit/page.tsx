@@ -1,19 +1,16 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 import { requireRole } from "@/lib/session";
-import { appShellSessionProps } from "@/lib/app-shell-session";
 
-import { AppShell, PageToolbar } from "@/components/layout";
+import { PageBodySkeleton, PageToolbar } from "@/components/layout";
 import { PageBreadcrumb } from "@/components/shared";
 
 import { listIngredients } from "@/features/ingredients";
 import { getSubRecipe, SubRecipeForm } from "@/features/sub-recipes";
 import { toSubRecipeFormValues } from "@/features/sub-recipes/lib/to-sub-recipe-form-values";
-import { getShopBranding } from "@/features/settings";
 
 import type { SubRecipeIngredientOption } from "@/features/sub-recipes/types/sub-recipe.types";
-
-export const instant = false;
 
 interface EditSubRecipePageProps {
   params: Promise<{ id: string }>;
@@ -29,15 +26,14 @@ function toIngredientOptions(
   }));
 }
 
-export default async function EditSubRecipePage({
+async function EditSubRecipePageContent({
   params,
 }: Readonly<EditSubRecipePageProps>) {
-  const session = await requireRole(["OWNER"]);
+  await requireRole(["OWNER"]);
   const { id } = await params;
-  const [subRecipe, ingredients, branding] = await Promise.all([
+  const [subRecipe, ingredients] = await Promise.all([
     getSubRecipe(id),
     listIngredients(),
-    getShopBranding(),
   ]);
 
   if (!subRecipe) {
@@ -45,11 +41,7 @@ export default async function EditSubRecipePage({
   }
 
   return (
-    <AppShell
-      {...appShellSessionProps(session)}
-      title={`Edit ${subRecipe.name}`}
-      branding={branding}
-    >
+    <>
       <PageBreadcrumb
         items={[
           { label: "Sub-recipes", href: "/sub-recipes" },
@@ -64,6 +56,16 @@ export default async function EditSubRecipePage({
         ingredients={toIngredientOptions(ingredients)}
         subRecipe={toSubRecipeFormValues(subRecipe)}
       />
-    </AppShell>
+    </>
+  );
+}
+
+export default function EditSubRecipePage({
+  params,
+}: Readonly<EditSubRecipePageProps>) {
+  return (
+    <Suspense fallback={<PageBodySkeleton />}>
+      <EditSubRecipePageContent params={params} />
+    </Suspense>
   );
 }

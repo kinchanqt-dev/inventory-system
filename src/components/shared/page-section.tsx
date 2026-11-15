@@ -21,7 +21,7 @@ export function PageSection({
     <section
       aria-labelledby={titleId}
       className={cn(
-        "rounded-xl border border-border/80 bg-card/40 p-4 sm:p-5",
+        "rounded-lg border border-border/80 bg-card/40 p-4 sm:p-5",
         className,
       )}
     >

@@ -35,7 +35,7 @@ export function CreateStaffForm() {
   return (
     <form
       action={formAction}
-      className="space-y-4 rounded-2xl border border-border/70 bg-card/90 p-4 shadow-[0_18px_40px_-28px_rgba(26,42,36,0.35)] sm:p-5"
+      className="space-y-4 rounded-lg border border-border/70 bg-card/90 p-4 shadow-[0_18px_40px_-28px_rgba(26,42,36,0.35)] sm:p-5"
       {...dirty.formDirtyProps}
     >
       <div>

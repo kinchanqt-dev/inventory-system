@@ -25,19 +25,19 @@ export default async function PlatformAdminPage() {
     >
       <div className="space-y-6">
         <section className="grid gap-3 sm:grid-cols-3">
-          <div className="rounded-2xl border border-border/70 bg-card/80 px-4 py-5 shadow-sm">
+          <div className="rounded-lg border border-border/70 bg-card/80 px-4 py-5 shadow-sm">
             <p className="font-heading text-3xl font-semibold tabular-nums tracking-tight">
               {stats.orgCount}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">Organizations</p>
           </div>
-          <div className="rounded-2xl border border-border/70 bg-card/80 px-4 py-5 shadow-sm">
+          <div className="rounded-lg border border-border/70 bg-card/80 px-4 py-5 shadow-sm">
             <p className="font-heading text-3xl font-semibold tabular-nums tracking-tight">
               {stats.suspendedCount}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">Suspended</p>
           </div>
-          <div className="rounded-2xl border border-border/70 bg-card/80 px-4 py-5 shadow-sm">
+          <div className="rounded-lg border border-border/70 bg-card/80 px-4 py-5 shadow-sm">
             <p className="font-heading text-3xl font-semibold tabular-nums tracking-tight">
               {stats.userCount}
             </p>
