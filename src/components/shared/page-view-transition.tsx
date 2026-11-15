@@ -9,6 +9,9 @@ interface PageViewTransitionProps {
 /**
  * Soft page enter/exit via React 19.3 ViewTransition.
  * Activates on Transition navigations (Next.js route changes).
+ *
+ * Do not wrap Instant Navigation shells that stream Suspense bodies —
+ * flushSync during prepare aborts the transition and warns in dev.
  */
 export function PageViewTransition({
   children,
