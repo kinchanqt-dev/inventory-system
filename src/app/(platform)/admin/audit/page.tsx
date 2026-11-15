@@ -22,7 +22,7 @@ export default async function PlatformAuditPage() {
       {entries.length === 0 ? (
         <p className="text-sm text-muted-foreground">No audit events yet</p>
       ) : (
-        <ul className="divide-y rounded-xl border">
+        <ul className="divide-y rounded-lg border">
           {entries.map((entry) => (
             <li key={entry.id} className="space-y-1 px-4 py-3">
               <div className="flex flex-wrap items-center justify-between gap-2">

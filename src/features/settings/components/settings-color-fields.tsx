@@ -129,7 +129,7 @@ export function SettingsColorFields({
     )?.id ?? null;
 
   return (
-    <section className="space-y-5 rounded-xl border border-border/80 p-4 sm:p-5">
+    <section className="space-y-5 rounded-lg border border-border/80 p-4 sm:p-5">
       <div>
         <h2 className="text-base font-semibold tracking-tight">Colors</h2>
         <p className="text-sm text-muted-foreground">
@@ -149,7 +149,7 @@ export function SettingsColorFields({
                 type="button"
                 onClick={() => applyLook(look)}
                 className={cn(
-                  "rounded-xl border p-3 text-left transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+                  "rounded-lg border p-3 text-left transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
                   isActive
                     ? "border-foreground bg-muted/60"
                     : "border-border/80 hover:bg-muted/40",

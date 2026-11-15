@@ -29,7 +29,7 @@ export default function LoginPage() {
 
         <section
           aria-label="Sign in"
-          className="mt-10 animate-in fade-in slide-in-from-bottom-4 fill-mode-both rounded-2xl border border-border/60 bg-card/85 p-5 shadow-[0_20px_50px_-28px_rgba(31,27,24,0.35)] backdrop-blur-md duration-500 delay-150 sm:p-6"
+          className="mt-10 animate-in fade-in slide-in-from-bottom-4 fill-mode-both rounded-lg border border-border/60 bg-card/85 p-5 shadow-[0_20px_50px_-28px_rgba(31,27,24,0.35)] backdrop-blur-md duration-500 delay-150 sm:p-6"
         >
           <Suspense
             fallback={

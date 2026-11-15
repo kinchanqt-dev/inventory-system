@@ -39,14 +39,14 @@ export function TeamMembersList({
 
   if (members.length === 0) {
     return (
-      <p className="rounded-2xl border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
+      <p className="rounded-lg border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
         No team members yet
       </p>
     );
   }
 
   return (
-    <ul className="overflow-hidden rounded-2xl border border-border/70 bg-card/90 shadow-[0_18px_40px_-28px_rgba(26,42,36,0.28)]">
+    <ul className="overflow-hidden rounded-lg border border-border/70 bg-card/90 shadow-[0_18px_40px_-28px_rgba(26,42,36,0.28)]">
       {members.map((member) => (
         <TeamMemberRow
           key={member.userId}

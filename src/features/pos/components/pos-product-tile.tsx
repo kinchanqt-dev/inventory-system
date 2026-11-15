@@ -34,7 +34,7 @@ export function PosProductTile({
       disabled={soldOut}
       onClick={() => onAdd(product)}
       className={cn(
-        "group min-h-28 overflow-hidden rounded-2xl border border-border/70 bg-card text-left shadow-sm transition duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none md:min-h-32",
+        "group min-h-28 overflow-hidden rounded-lg border border-border/70 bg-card text-left shadow-sm transition duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none md:min-h-32",
         soldOut
           ? "cursor-not-allowed opacity-55"
           : "hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-md active:translate-y-0",

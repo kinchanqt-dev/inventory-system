@@ -78,7 +78,7 @@ function LabeledThemeToggle({
   return (
     <div
       className={cn(
-        "flex min-h-11 w-full items-center justify-between gap-3 rounded-xl border border-border/70 bg-background/70 px-3",
+        "flex min-h-11 w-full items-center justify-between gap-3 rounded-lg border border-border/70 bg-background/70 px-3",
         className,
       )}
     >

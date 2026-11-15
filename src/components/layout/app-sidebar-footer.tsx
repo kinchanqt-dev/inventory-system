@@ -65,7 +65,11 @@ export function AppSidebarFooter({
       )}
     >
       {isPlatformAdmin ? <AdminLinkButton collapsed={collapsed} /> : null}
-      <ThemeToggle compact={collapsed} labeled={!collapsed} />
+      <ThemeToggle
+        compact={collapsed}
+        labeled={!collapsed}
+        className={collapsed ? "w-full" : undefined}
+      />
       <SignOutButton collapsed={collapsed} />
     </div>
   );

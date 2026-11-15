@@ -36,7 +36,7 @@ export function CategoriesManager({
           <p className="px-1 text-[0.7rem] font-medium tracking-[0.16em] text-muted-foreground uppercase">
             New
           </p>
-          <div className="rounded-2xl border border-border/70 bg-card/90 p-4 shadow-[0_18px_40px_-28px_rgba(26,42,36,0.35)] sm:p-5">
+          <div className="rounded-lg border border-border/70 bg-card/90 p-4 shadow-[0_18px_40px_-28px_rgba(26,42,36,0.35)] sm:p-5">
             <CategoryCreateForm key={activeKind} kind={activeKind} />
           </div>
         </aside>
@@ -52,12 +52,12 @@ export function CategoriesManager({
           </div>
 
           {visibleCategories.length === 0 ? (
-            <p className="rounded-2xl border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
+            <p className="rounded-lg border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
               No {categoryKindLabel(activeKind).toLowerCase()} categories yet.
               Add one on the left—forms will pick it up automatically.
             </p>
           ) : (
-            <ul className="overflow-hidden rounded-2xl border border-border/70 bg-card/90 shadow-[0_18px_40px_-28px_rgba(26,42,36,0.28)]">
+            <ul className="overflow-hidden rounded-lg border border-border/70 bg-card/90 shadow-[0_18px_40px_-28px_rgba(26,42,36,0.28)]">
               {visibleCategories.map((category) => (
                 <CategoryRow key={category.id} category={category} />
               ))}

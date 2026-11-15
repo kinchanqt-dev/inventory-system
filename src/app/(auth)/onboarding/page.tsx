@@ -56,7 +56,7 @@ export default async function OnboardingPage() {
           This creates your private food shop workspace. Other businesses cannot
           see your inventory or sales.
         </p>
-        <section className="mt-8 rounded-2xl border border-border/60 bg-card/85 p-5 shadow-[0_20px_50px_-28px_rgba(31,27,24,0.35)] backdrop-blur-md sm:p-6">
+        <section className="mt-8 rounded-lg border border-border/60 bg-card/85 p-5 shadow-[0_20px_50px_-28px_rgba(31,27,24,0.35)] backdrop-blur-md sm:p-6">
           <CreateOrganizationForm />
         </section>
       </AuthSurface>

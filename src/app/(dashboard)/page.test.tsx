@@ -25,9 +25,6 @@ vi.mock("@/features/inventory/api/inventory.queries", () => ({
 }));
 
 vi.mock("@/components/layout", () => ({
-  AppShell: ({ children }: { children: React.ReactNode }) => (
-    <div>{children}</div>
-  ),
   PageToolbar: ({
     description,
     actions,
