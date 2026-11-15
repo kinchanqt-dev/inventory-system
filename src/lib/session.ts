@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 
 import { homePathForRole } from "@/enums";
 import { ACTIVE_ORG_COOKIE } from "@/lib/org-cookie";
@@ -27,14 +28,14 @@ export interface AppSession {
   isSupportMode: boolean;
 }
 
-export async function getAuthUser() {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) {
-    return null;
-  }
-  return data.user;
-}
+export const getAuthUser = cache(async () => {
+	const supabase = await createClient();
+	const { data, error } = await supabase.auth.getUser();
+	if (error || !data.user) {
+		return null;
+	}
+	return data.user;
+});
 
 export async function requireAuthUser() {
   const user = await getAuthUser();
@@ -79,10 +80,15 @@ export async function listUserOrganizations(userId: string) {
     throw new Error(error.message);
   }
 
-  return (data ?? []).flatMap((row) => {
-    const membership = membershipFromRow(row);
-    return membership ? [membership] : [];
-  });
+  return (data ?? []).flatMap(
+		(row: {
+			role: string;
+			organizations: Organization | Organization[] | null;
+		}) => {
+			const membership = membershipFromRow(row);
+			return membership ? [membership] : [];
+		},
+	);
 }
 
 function pickActiveMembership(
@@ -287,17 +293,17 @@ async function sessionFromMembership(
   };
 }
 
-export async function requireSession(): Promise<AppSession> {
-  const user = await requireAuthUser();
-  const platformAdmin = isPlatformAdminUser(user);
-  const support = await resolveSupportOrganization(user);
+export const requireSession = cache(async (): Promise<AppSession> => {
+	const user = await requireAuthUser();
+	const platformAdmin = isPlatformAdminUser(user);
+	const support = await resolveSupportOrganization(user);
 
-  if (support) {
-    return sessionFromSupport(user, support, platformAdmin);
-  }
+	if (support) {
+		return sessionFromSupport(user, support, platformAdmin);
+	}
 
-  return sessionFromMembership(user, platformAdmin);
-}
+	return sessionFromMembership(user, platformAdmin);
+});
 
 export async function requireRole(roles: OrgRole[]) {
   const session = await requireSession();

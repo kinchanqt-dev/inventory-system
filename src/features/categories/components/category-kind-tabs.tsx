@@ -18,7 +18,7 @@ interface CategoryKindTabsProps {
 
 function tabClass(active: boolean) {
   return cn(
-    "min-h-11 rounded-xl px-4 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+    "min-h-11 rounded-lg px-4 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
     active
       ? "bg-primary font-medium text-primary-foreground shadow-sm"
       : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -34,7 +34,7 @@ export function CategoryKindTabs({
       <div
         role="tablist"
         aria-label="Category type"
-        className="inline-flex flex-wrap gap-1 rounded-2xl border border-border/70 bg-card/70 p-1"
+        className="inline-flex flex-wrap gap-1 rounded-lg border border-border/70 bg-card/70 p-1"
       >
         {KINDS.map((kind) => {
           const active = activeKind === kind;

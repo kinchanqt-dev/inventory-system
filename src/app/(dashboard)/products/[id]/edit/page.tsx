@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 import { requireRole } from "@/lib/session";
-import { appShellSessionProps } from "@/lib/app-shell-session";
 
-import { AppShell, PageToolbar } from "@/components/layout";
+import { PageBodySkeleton, PageToolbar } from "@/components/layout";
 import { PageBreadcrumb } from "@/components/shared";
 
 import { ProductForm, RecipeEditor } from "@/features/products";
@@ -13,20 +13,16 @@ import {
   toRecipeEditorOptions,
 } from "@/features/products/lib/load-edit-product-page";
 import { toProductFormValues } from "@/features/products/lib/to-product-form-values";
-import { getShopBranding } from "@/features/settings";
-
-export const instant = false;
 
 interface EditProductPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function EditProductPage({
+async function EditProductPageContent({
   params,
 }: Readonly<EditProductPageProps>) {
   const session = await requireRole(["OWNER"]);
   const { id } = await params;
-  const branding = await getShopBranding();
   const { product, categories, recipe, ingredients, subRecipes } =
     await loadEditProductPageData(id);
 
@@ -37,11 +33,7 @@ export default async function EditProductPage({
   const recipeOptions = toRecipeEditorOptions(ingredients, subRecipes);
 
   return (
-    <AppShell
-      {...appShellSessionProps(session)}
-      title={`Edit ${product.name}`}
-      branding={branding}
-    >
+    <>
       <PageBreadcrumb
         items={[
           { label: "Products", href: "/products" },
@@ -66,6 +58,16 @@ export default async function EditProductPage({
         categories={categories}
         product={toProductFormValues(product)}
       />
-    </AppShell>
+    </>
+  );
+}
+
+export default function EditProductPage({
+  params,
+}: Readonly<EditProductPageProps>) {
+  return (
+    <Suspense fallback={<PageBodySkeleton />}>
+      <EditProductPageContent params={params} />
+    </Suspense>
   );
 }

@@ -44,7 +44,7 @@ export function ProductFormFields({
 }: Readonly<ProductFormFieldsProps>) {
   return (
     <div className="space-y-6">
-      <section className="space-y-4 rounded-xl border border-border/80 p-4 sm:p-5">
+      <section className="space-y-4 rounded-lg border border-border/80 p-4 sm:p-5">
         <div>
           <h2 className="text-base font-semibold tracking-tight">Item details</h2>
           <p className="text-sm text-muted-foreground">
@@ -61,7 +61,7 @@ export function ProductFormFields({
         </div>
       </section>
 
-      <section className="space-y-4 rounded-xl border border-border/80 p-4 sm:p-5">
+      <section className="space-y-4 rounded-lg border border-border/80 p-4 sm:p-5">
         <div>
           <h2 className="text-base font-semibold tracking-tight">Image</h2>
           <p className="text-sm text-muted-foreground">
@@ -76,7 +76,7 @@ export function ProductFormFields({
 
       {beforePricing}
 
-      <section className="space-y-4 rounded-xl border border-border/80 p-4 sm:p-5">
+      <section className="space-y-4 rounded-lg border border-border/80 p-4 sm:p-5">
         <div>
           <h2 className="text-base font-semibold tracking-tight">
             Pricing &amp; stock

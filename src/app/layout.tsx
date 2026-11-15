@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 import { connection } from "next/server";
+import { Suspense } from "react";
 
 import { UnsavedChangesDialog } from "@/components/shared";
 import { Toaster } from "@/components/ui";
@@ -14,8 +15,6 @@ import {
 } from "@/features/settings";
 
 import "./globals.css";
-
-export const instant = false;
 
 const geistSans = Geist({
   variable: "--font-sans",
@@ -52,7 +51,17 @@ export const viewport = {
   ],
 };
 
-export default async function RootLayout({
+function AppChrome({ children }: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <ThemeProvider>
+      {children}
+      <Toaster />
+      <UnsavedChangesDialog />
+    </ThemeProvider>
+  );
+}
+
+async function BrandedAppChrome({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   await connection();
@@ -60,18 +69,30 @@ export default async function RootLayout({
   const brandStyle = brandingCssVariables(branding) as CSSProperties;
 
   return (
+    <div
+      className="flex min-h-full flex-1 flex-col"
+      style={brandStyle}
+    >
+      <AppChrome>{children}</AppChrome>
+    </div>
+  );
+}
+
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
-      style={brandStyle}
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col font-sans">
-        <ThemeProvider>
-          {children}
-          <Toaster />
-          <UnsavedChangesDialog />
-        </ThemeProvider>
+        <Suspense
+          fallback={<AppChrome>{children}</AppChrome>}
+        >
+          <BrandedAppChrome>{children}</BrandedAppChrome>
+        </Suspense>
       </body>
     </html>
   );

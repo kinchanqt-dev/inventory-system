@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 
 import { useImageDropzoneState } from "@/components/shared/use-image-dropzone-state";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 
 interface ImageDropzoneProps {
@@ -98,7 +99,7 @@ function DropSurface({
         onDropFile(event.dataTransfer.files?.[0]);
       }}
       className={cn(
-        "flex min-h-36 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed px-4 py-6 text-center transition-colors",
+        "flex min-h-36 cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-6 text-center transition-colors",
         isDragging
           ? "border-accent bg-accent/10 text-foreground"
           : "border-border bg-muted/30 text-muted-foreground hover:border-foreground/30 hover:bg-muted/50",
@@ -139,12 +140,11 @@ function DropzoneFooter({
     <>
       {existingPath ? (
         <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
+          <Checkbox
             name={removeInputName}
             value="true"
             checked={removeChecked}
-            onChange={(event) => onRemoveToggle(event.target.checked)}
+            onCheckedChange={(checked) => onRemoveToggle(checked === true)}
           />
           <span>{removeLabel}</span>
         </label>

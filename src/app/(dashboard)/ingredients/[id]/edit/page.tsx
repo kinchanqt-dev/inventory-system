@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 import { requireRole } from "@/lib/session";
-import { appShellSessionProps } from "@/lib/app-shell-session";
 
-import { AppShell, PageToolbar } from "@/components/layout";
+import { PageBodySkeleton, PageToolbar } from "@/components/layout";
 import { PageBreadcrumb } from "@/components/shared";
 
 import {
@@ -12,23 +12,19 @@ import {
   listIngredientCategories,
 } from "@/features/ingredients";
 import { toIngredientFormValues } from "@/features/ingredients/lib/to-ingredient-form-values";
-import { getShopBranding } from "@/features/settings";
-
-export const instant = false;
 
 interface EditIngredientPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function EditIngredientPage({
+async function EditIngredientPageContent({
   params,
 }: Readonly<EditIngredientPageProps>) {
-  const session = await requireRole(["OWNER"]);
+  await requireRole(["OWNER"]);
   const { id } = await params;
-  const [ingredient, categories, branding] = await Promise.all([
+  const [ingredient, categories] = await Promise.all([
     getIngredient(id),
     listIngredientCategories(),
-    getShopBranding(),
   ]);
 
   if (!ingredient) {
@@ -36,11 +32,7 @@ export default async function EditIngredientPage({
   }
 
   return (
-    <AppShell
-      {...appShellSessionProps(session)}
-      title={`Edit ${ingredient.name}`}
-      branding={branding}
-    >
+    <>
       <PageBreadcrumb
         items={[
           { label: "Ingredients", href: "/ingredients" },
@@ -55,6 +47,16 @@ export default async function EditIngredientPage({
         categories={categories}
         ingredient={toIngredientFormValues(ingredient)}
       />
-    </AppShell>
+    </>
+  );
+}
+
+export default function EditIngredientPage({
+  params,
+}: Readonly<EditIngredientPageProps>) {
+  return (
+    <Suspense fallback={<PageBodySkeleton />}>
+      <EditIngredientPageContent params={params} />
+    </Suspense>
   );
 }

@@ -1,30 +1,17 @@
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { requireRole } from "@/lib/session";
-import { appShellSessionProps } from "@/lib/app-shell-session";
 
-import { AppShell, PageToolbar } from "@/components/layout";
+import { PageBodySkeleton, PageToolbar } from "@/components/layout";
 import { PageBreadcrumb } from "@/components/shared";
 import { Button } from "@/components/ui";
 
 import { listProducts, ProductsTable } from "@/features/products";
-import { getShopBranding } from "@/features/settings";
 
-export const instant = false;
-
-export default async function ProductsPage() {
-  const session = await requireRole(["OWNER"]);
-  const [products, branding] = await Promise.all([
-    listProducts(),
-    getShopBranding(),
-  ]);
-
+function ProductsPageChrome() {
   return (
-    <AppShell
-      {...appShellSessionProps(session)}
-      title="Products"
-      branding={branding}
-    >
+    <>
       <PageBreadcrumb items={[{ label: "Products" }]} />
       <PageToolbar
         description="Add and manage the food items you sell. Photos are optional and make items easier to spot."
@@ -39,7 +26,23 @@ export default async function ProductsPage() {
           </Button>
         }
       />
-      <ProductsTable products={products} />
-    </AppShell>
+    </>
+  );
+}
+
+async function ProductsPageContent() {
+  await requireRole(["OWNER"]);
+  const products = await listProducts();
+  return <ProductsTable products={products} />;
+}
+
+export default function ProductsPage() {
+  return (
+    <>
+      <ProductsPageChrome />
+      <Suspense fallback={<PageBodySkeleton />}>
+        <ProductsPageContent />
+      </Suspense>
+    </>
   );
 }

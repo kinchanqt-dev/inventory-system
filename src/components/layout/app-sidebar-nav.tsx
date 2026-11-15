@@ -16,7 +16,7 @@ interface AppSidebarNavProps {
 
 function sidebarLinkClass(isActive: boolean, collapsed: boolean) {
   return cn(
-    "inline-flex min-h-11 items-center rounded-xl text-sm transition-colors",
+    "inline-flex min-h-11 items-center rounded-lg text-sm transition-colors",
     // Keep focus inside the pill so the global ring-offset does not box the whole row.
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-offset-0",
     collapsed ? "w-full justify-center px-0" : "w-full gap-2.5 px-3",

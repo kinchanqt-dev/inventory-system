@@ -25,7 +25,7 @@ export default function RegisterPage() {
 
         <section
           aria-label="Create account"
-          className="mt-10 rounded-2xl border border-border/60 bg-card/85 p-5 shadow-[0_20px_50px_-28px_rgba(31,27,24,0.35)] backdrop-blur-md sm:p-6"
+          className="mt-10 rounded-lg border border-border/60 bg-card/85 p-5 shadow-[0_20px_50px_-28px_rgba(31,27,24,0.35)] backdrop-blur-md sm:p-6"
         >
           <RegisterForm />
           <p className="mt-4 text-center text-sm text-muted-foreground">

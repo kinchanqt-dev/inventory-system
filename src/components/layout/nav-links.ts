@@ -126,6 +126,37 @@ export function isNavLinkActive(pathname: string, href: string) {
   return pathname.startsWith(href);
 }
 
+const DASHBOARD_FORM_TITLES: Array<{ pattern: RegExp; title: string }> = [
+  { pattern: /^\/products\/new$/, title: "Add product" },
+  { pattern: /^\/products\/[^/]+\/edit$/, title: "Edit product" },
+  { pattern: /^\/ingredients\/new$/, title: "Add ingredient" },
+  { pattern: /^\/ingredients\/[^/]+\/edit$/, title: "Edit ingredient" },
+  { pattern: /^\/sub-recipes\/new$/, title: "Add sub-recipe" },
+  { pattern: /^\/sub-recipes\/[^/]+\/edit$/, title: "Edit sub-recipe" },
+];
+
+function formTitleForPath(pathname: string) {
+  return DASHBOARD_FORM_TITLES.find((rule) => rule.pattern.test(pathname))
+    ?.title;
+}
+
+function navTitleForPath(pathname: string) {
+  const exact = NAV_LINKS.find((link) => link.href === pathname);
+  if (exact) {
+    return exact.label;
+  }
+  return NAV_LINKS.find(
+    (link) => link.href !== "/" && pathname.startsWith(link.href),
+  )?.label;
+}
+
+/** Header title for dashboard routes (exact nav match, then nested forms). */
+export function dashboardTitleForPath(pathname: string) {
+  return (
+    navTitleForPath(pathname) ?? formTitleForPath(pathname) ?? "Dashboard"
+  );
+}
+
 function navLinksForRole(role: RoleValue) {
   return NAV_LINKS.filter((link) => link.roles.includes(role));
 }

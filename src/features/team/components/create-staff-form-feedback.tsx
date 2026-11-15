@@ -16,7 +16,7 @@ export function CreateStaffFormFeedback({
   }
 
   return (
-    <p className="rounded-xl border border-accent/30 bg-accent/10 px-3 py-2 text-sm text-foreground">
+    <p className="rounded-lg border border-accent/30 bg-accent/10 px-3 py-2 text-sm text-foreground">
       {success}
     </p>
   );

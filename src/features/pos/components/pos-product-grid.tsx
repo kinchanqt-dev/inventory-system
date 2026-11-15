@@ -25,7 +25,7 @@ function PosProductGridBody({
 }: Readonly<Pick<PosProductGridProps, "products" | "onAdd">>) {
   if (products.length === 0) {
     return (
-      <p className="col-span-full rounded-2xl border border-dashed bg-card/50 p-8 text-center text-sm text-muted-foreground">
+      <p className="col-span-full rounded-lg border border-dashed bg-card/50 p-8 text-center text-sm text-muted-foreground">
         No products match this search
       </p>
     );
@@ -59,7 +59,7 @@ export function PosProductGrid({
           aria-hidden
         />
         <Input
-          className="min-h-12 rounded-xl border-border/70 bg-card/80 pl-10 text-base shadow-sm md:min-h-14"
+          className="min-h-12 rounded-lg border-border/70 bg-card/80 pl-10 text-base shadow-sm md:min-h-14"
           placeholder="Search by name or item code"
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}

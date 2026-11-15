@@ -1,4 +1,4 @@
-import { Label } from "@/components/ui";
+import { Checkbox, Label } from "@/components/ui";
 
 import type { ProductFormValues } from "@/features/products/types/product.types";
 
@@ -13,14 +13,13 @@ export function ProductPricingKitchenField({
 
   return (
     <div className="flex items-start gap-3 text-sm sm:col-span-2">
-      <input
+      <Checkbox
         id="sendsToKitchen"
-        type="checkbox"
         name="sendsToKitchen"
         value="true"
         defaultChecked={defaultChecked}
         aria-describedby="sendsToKitchen-hint"
-        className="mt-1 size-4 rounded border-border"
+        className="mt-1"
       />
       <div>
         <Label htmlFor="sendsToKitchen">Send to kitchen</Label>

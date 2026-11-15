@@ -1,25 +1,17 @@
-import { appShellSessionProps } from "@/lib/app-shell-session";
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { loadOwnerIngredientsPage } from "@/lib/owner-ingredients-page";
 
-import { AppShell, PageToolbar } from "@/components/layout";
+import { PageBodySkeleton, PageToolbar } from "@/components/layout";
 import { PageBreadcrumb } from "@/components/shared";
 import { Button } from "@/components/ui";
 
 import { IngredientsTable } from "@/features/ingredients";
 
-export const instant = false;
-
-export default async function IngredientsPage() {
-  const { session, ingredients, branding } = await loadOwnerIngredientsPage();
-
+function IngredientsPageChrome() {
   return (
-    <AppShell
-      {...appShellSessionProps(session)}
-      title="Ingredients"
-      branding={branding}
-    >
+    <>
       <PageBreadcrumb items={[{ label: "Ingredients" }]} />
       <PageToolbar
         description="Track purchased goods, pack costs, yield, and kitchen stock for recipes."
@@ -34,7 +26,22 @@ export default async function IngredientsPage() {
           </Button>
         }
       />
-      <IngredientsTable ingredients={ingredients} />
-    </AppShell>
+    </>
+  );
+}
+
+async function IngredientsPageContent() {
+  const { ingredients } = await loadOwnerIngredientsPage();
+  return <IngredientsTable ingredients={ingredients} />;
+}
+
+export default function IngredientsPage() {
+  return (
+    <>
+      <IngredientsPageChrome />
+      <Suspense fallback={<PageBodySkeleton />}>
+        <IngredientsPageContent />
+      </Suspense>
+    </>
   );
 }

@@ -16,7 +16,7 @@ import type { ShopBranding } from "@/features/settings";
 interface AppHeaderProps {
   name: string;
   role: RoleValue;
-  title: string;
+  title: React.ReactNode;
   branding: ShopBranding;
   isPlatformAdmin?: boolean;
 }

@@ -1,14 +1,13 @@
-import { appShellSessionProps } from "@/lib/app-shell-session";
+import { Suspense } from "react";
+
 import { loadOwnerIngredientsPage } from "@/lib/owner-ingredients-page";
 
-import { AppShell, PageToolbar } from "@/components/layout";
+import { PageBodySkeleton, PageToolbar } from "@/components/layout";
 import { PageBreadcrumb } from "@/components/shared";
 
 import { SubRecipeForm } from "@/features/sub-recipes";
 
 import type { SubRecipeIngredientOption } from "@/features/sub-recipes/types/sub-recipe.types";
-
-export const instant = false;
 
 function toIngredientOptions(
   ingredients: Awaited<
@@ -22,15 +21,9 @@ function toIngredientOptions(
   }));
 }
 
-export default async function NewSubRecipePage() {
-  const { session, ingredients, branding } = await loadOwnerIngredientsPage();
-
+function NewSubRecipePageChrome() {
   return (
-    <AppShell
-      {...appShellSessionProps(session)}
-      title="Add sub-recipe"
-      branding={branding}
-    >
+    <>
       <PageBreadcrumb
         items={[
           { label: "Sub-recipes", href: "/sub-recipes" },
@@ -41,7 +34,22 @@ export default async function NewSubRecipePage() {
         description="Define a prep batch and which ingredients go into one yield."
         hint="Choose batch quantity and unit first — menu recipes will reference that yield."
       />
-      <SubRecipeForm ingredients={toIngredientOptions(ingredients)} />
-    </AppShell>
+    </>
+  );
+}
+
+async function NewSubRecipePageContent() {
+  const { ingredients } = await loadOwnerIngredientsPage();
+  return <SubRecipeForm ingredients={toIngredientOptions(ingredients)} />;
+}
+
+export default function NewSubRecipePage() {
+  return (
+    <>
+      <NewSubRecipePageChrome />
+      <Suspense fallback={<PageBodySkeleton />}>
+        <NewSubRecipePageContent />
+      </Suspense>
+    </>
   );
 }

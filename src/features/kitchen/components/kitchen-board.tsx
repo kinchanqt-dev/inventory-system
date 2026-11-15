@@ -128,7 +128,7 @@ export function KitchenBoard({
         return (
           <section
             key={column.status}
-            className="flex min-h-kitchen-column flex-col rounded-2xl border bg-muted/30 p-3 sm:p-4"
+            className="flex min-h-kitchen-column flex-col rounded-lg border bg-muted/30 p-3 sm:p-4"
           >
             <header className="mb-3 flex items-baseline justify-between gap-2 px-1">
               <div>
